@@ -68,7 +68,7 @@ function ProductsPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate({ search: (prev) => ({ ...prev, q: query || undefined }) });
+            navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, q: query || undefined }) });
           }}
           className="relative w-full md:max-w-md"
         >
@@ -82,14 +82,14 @@ function ProductsPage() {
         </form>
 
         <div className="flex flex-wrap gap-2">
-          <FilterPill active={!kategori} onClick={() => navigate({ search: (prev) => ({ ...prev, kategori: undefined }) })}>
+          <FilterPill active={!kategori} onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: undefined }) })}>
             Semua
           </FilterPill>
           {(categories ?? []).map((c) => (
             <FilterPill
               key={c.id}
               active={kategori === c.slug}
-              onClick={() => navigate({ search: (prev) => ({ ...prev, kategori: c.slug }) })}
+              onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: c.slug }) })}
             >
               {c.name}
             </FilterPill>
