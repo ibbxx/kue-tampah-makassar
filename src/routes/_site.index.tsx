@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles, ShieldCheck, Truck, Package, ChevronDown } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, Truck, Package, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase, type Product, type Category, type HomepageHero } from "@/lib/supabase";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useState, useEffect } from "react";
@@ -106,11 +106,12 @@ function HomePage() {
   const heroImages = hero.image_url ? hero.image_url.split(",").filter(Boolean) : [];
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
 
+  const nextSlide = () => setCurrentHeroImage((prev) => (prev + 1) % heroImages.length);
+  const prevSlide = () => setCurrentHeroImage((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+
   useEffect(() => {
     if (heroImages.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentHeroImage((prev) => (prev + 1) % heroImages.length);
-      }, 5000);
+      const interval = setInterval(nextSlide, 5000);
       return () => clearInterval(interval);
     }
   }, [heroImages.length]);
@@ -138,6 +139,38 @@ function HomePage() {
           {/* Overlay to ensure text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
         </div>
+
+        {/* Manual Controls */}
+        {heroImages.length > 1 && (
+          <>
+            <button 
+              onClick={prevSlide}
+              className="absolute left-4 z-20 flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-black/20 text-white/70 backdrop-blur-md transition-all hover:bg-black/40 hover:text-white"
+              aria-label="Previous Slide"
+            >
+              <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
+            </button>
+            <button 
+              onClick={nextSlide}
+              className="absolute right-4 z-20 flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-black/20 text-white/70 backdrop-blur-md transition-all hover:bg-black/40 hover:text-white"
+              aria-label="Next Slide"
+            >
+              <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
+            </button>
+            
+            {/* Dots */}
+            <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-2">
+              {heroImages.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentHeroImage(i)}
+                  className={`h-2 rounded-full transition-all ${i === currentHeroImage ? "w-8 bg-primary" : "w-2 bg-white/50 hover:bg-white/80"}`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Hero Content */}
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-24 pb-12 md:px-8">
