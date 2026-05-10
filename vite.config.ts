@@ -1,18 +1,14 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import { cloudflare } from "@cloudflare/vite-plugin";
+
 import tailwindcss from "@tailwindcss/vite";
 
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   plugins: [
     tailwindcss(),
-    tanstackStart({
-      server: { entry: "src/server.ts" },
-    }),
+    tanstackStart(),
     react(),
-    // Only enable Cloudflare during build to avoid resolution errors in dev
-    command === "build" ? cloudflare() : null,
   ],
   resolve: {
     tsconfigPaths: true,
@@ -27,4 +23,4 @@ export default defineConfig(({ command }) => ({
       "@tanstack/react-start-client",
     ],
   },
-}));
+});
