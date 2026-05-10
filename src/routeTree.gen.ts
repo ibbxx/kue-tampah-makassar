@@ -12,7 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as SiteRouteImport } from './routes/_site'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
+import { Route as AdminStokRouteImport } from './routes/admin.stok'
+import { Route as AdminProdukRouteImport } from './routes/admin.produk'
+import { Route as AdminPesanRouteImport } from './routes/admin.pesan'
+import { Route as AdminPanduanRouteImport } from './routes/admin.panduan'
+import { Route as AdminOrderRouteImport } from './routes/admin.order'
+import { Route as AdminKategoriRouteImport } from './routes/admin.kategori'
+import { Route as AdminArtikelRouteImport } from './routes/admin.artikel'
 import { Route as SiteTentangRouteImport } from './routes/_site.tentang'
 import { Route as SiteProdukRouteImport } from './routes/_site.produk'
 import { Route as SiteKontakRouteImport } from './routes/_site.kontak'
@@ -35,10 +43,50 @@ const SiteRoute = SiteRouteImport.update({
   id: '/_site',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const SiteIndexRoute = SiteIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SiteRoute,
+} as any)
+const AdminStokRoute = AdminStokRouteImport.update({
+  id: '/stok',
+  path: '/stok',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProdukRoute = AdminProdukRouteImport.update({
+  id: '/produk',
+  path: '/produk',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPesanRoute = AdminPesanRouteImport.update({
+  id: '/pesan',
+  path: '/pesan',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPanduanRoute = AdminPanduanRouteImport.update({
+  id: '/panduan',
+  path: '/panduan',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrderRoute = AdminOrderRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminKategoriRoute = AdminKategoriRouteImport.update({
+  id: '/kategori',
+  path: '/kategori',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminArtikelRoute = AdminArtikelRouteImport.update({
+  id: '/artikel',
+  path: '/artikel',
+  getParentRoute: () => AdminRoute,
 } as any)
 const SiteTentangRoute = SiteTentangRouteImport.update({
   id: '/tentang',
@@ -78,39 +126,62 @@ const SiteArtikelSlugRoute = SiteArtikelSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
   '/produk': typeof SiteProdukRouteWithChildren
   '/tentang': typeof SiteTentangRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/order': typeof AdminOrderRoute
+  '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pesan': typeof AdminPesanRoute
+  '/admin/produk': typeof AdminProdukRoute
+  '/admin/stok': typeof AdminStokRoute
+  '/admin/': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
   '/produk/$slug': typeof SiteProdukSlugRoute
 }
 export interface FileRoutesByTo {
-  '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
   '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
   '/produk': typeof SiteProdukRouteWithChildren
   '/tentang': typeof SiteTentangRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/order': typeof AdminOrderRoute
+  '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pesan': typeof AdminPesanRoute
+  '/admin/produk': typeof AdminProdukRoute
+  '/admin/stok': typeof AdminStokRoute
   '/': typeof SiteIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
   '/produk/$slug': typeof SiteProdukSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_site': typeof SiteRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/_site/artikel': typeof SiteArtikelRouteWithChildren
   '/_site/keranjang': typeof SiteKeranjangRoute
   '/_site/kontak': typeof SiteKontakRoute
   '/_site/produk': typeof SiteProdukRouteWithChildren
   '/_site/tentang': typeof SiteTentangRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/order': typeof AdminOrderRoute
+  '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pesan': typeof AdminPesanRoute
+  '/admin/produk': typeof AdminProdukRoute
+  '/admin/stok': typeof AdminStokRoute
   '/_site/': typeof SiteIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/_site/artikel/$slug': typeof SiteArtikelSlugRoute
   '/_site/produk/$slug': typeof SiteProdukSlugRoute
 }
@@ -125,18 +196,33 @@ export interface FileRouteTypes {
     | '/kontak'
     | '/produk'
     | '/tentang'
+    | '/admin/artikel'
+    | '/admin/kategori'
+    | '/admin/order'
+    | '/admin/panduan'
+    | '/admin/pesan'
+    | '/admin/produk'
+    | '/admin/stok'
+    | '/admin/'
     | '/artikel/$slug'
     | '/produk/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/admin'
     | '/login'
     | '/artikel'
     | '/keranjang'
     | '/kontak'
     | '/produk'
     | '/tentang'
+    | '/admin/artikel'
+    | '/admin/kategori'
+    | '/admin/order'
+    | '/admin/panduan'
+    | '/admin/pesan'
+    | '/admin/produk'
+    | '/admin/stok'
     | '/'
+    | '/admin'
     | '/artikel/$slug'
     | '/produk/$slug'
   id:
@@ -149,14 +235,22 @@ export interface FileRouteTypes {
     | '/_site/kontak'
     | '/_site/produk'
     | '/_site/tentang'
+    | '/admin/artikel'
+    | '/admin/kategori'
+    | '/admin/order'
+    | '/admin/panduan'
+    | '/admin/pesan'
+    | '/admin/produk'
+    | '/admin/stok'
     | '/_site/'
+    | '/admin/'
     | '/_site/artikel/$slug'
     | '/_site/produk/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   SiteRoute: typeof SiteRouteWithChildren
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -183,12 +277,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_site/': {
       id: '/_site/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof SiteIndexRouteImport
       parentRoute: typeof SiteRoute
+    }
+    '/admin/stok': {
+      id: '/admin/stok'
+      path: '/stok'
+      fullPath: '/admin/stok'
+      preLoaderRoute: typeof AdminStokRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/produk': {
+      id: '/admin/produk'
+      path: '/produk'
+      fullPath: '/admin/produk'
+      preLoaderRoute: typeof AdminProdukRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pesan': {
+      id: '/admin/pesan'
+      path: '/pesan'
+      fullPath: '/admin/pesan'
+      preLoaderRoute: typeof AdminPesanRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/panduan': {
+      id: '/admin/panduan'
+      path: '/panduan'
+      fullPath: '/admin/panduan'
+      preLoaderRoute: typeof AdminPanduanRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/order': {
+      id: '/admin/order'
+      path: '/order'
+      fullPath: '/admin/order'
+      preLoaderRoute: typeof AdminOrderRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/kategori': {
+      id: '/admin/kategori'
+      path: '/kategori'
+      fullPath: '/admin/kategori'
+      preLoaderRoute: typeof AdminKategoriRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/artikel': {
+      id: '/admin/artikel'
+      path: '/artikel'
+      fullPath: '/admin/artikel'
+      preLoaderRoute: typeof AdminArtikelRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_site/tentang': {
       id: '/_site/tentang'
@@ -286,9 +436,33 @@ const SiteRouteChildren: SiteRouteChildren = {
 
 const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
 
+interface AdminRouteChildren {
+  AdminArtikelRoute: typeof AdminArtikelRoute
+  AdminKategoriRoute: typeof AdminKategoriRoute
+  AdminOrderRoute: typeof AdminOrderRoute
+  AdminPanduanRoute: typeof AdminPanduanRoute
+  AdminPesanRoute: typeof AdminPesanRoute
+  AdminProdukRoute: typeof AdminProdukRoute
+  AdminStokRoute: typeof AdminStokRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminArtikelRoute: AdminArtikelRoute,
+  AdminKategoriRoute: AdminKategoriRoute,
+  AdminOrderRoute: AdminOrderRoute,
+  AdminPanduanRoute: AdminPanduanRoute,
+  AdminPesanRoute: AdminPesanRoute,
+  AdminProdukRoute: AdminProdukRoute,
+  AdminStokRoute: AdminStokRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   SiteRoute: SiteRouteWithChildren,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
