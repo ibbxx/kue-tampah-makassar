@@ -25,6 +25,9 @@ function OrderAdmin() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<OrderStatus | "semua">("semua");
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin", "orders"],
@@ -137,107 +140,114 @@ function OrderAdmin() {
           filteredOrders.map((o) => {
             const statusConfig = STATUS_UI[o.status as OrderStatus] || STATUS_UI.pending;
             const StatusIcon = statusConfig.icon;
+            const isExpanded = expanded[o.id];
 
             return (
               <div key={o.id} className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/30">
                 {/* Colored accent bar */}
                 <div className={cn("absolute left-0 top-0 bottom-0 w-1.5 transition-opacity", statusConfig.bg, "opacity-70 group-hover:opacity-100")} />
                 
-                <div className="p-5 sm:p-6 pl-6 sm:pl-8">
-                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                    
-                    {/* Order Info */}
-                    <div className="flex-1 space-y-4">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className="font-mono text-xs font-semibold text-muted-foreground bg-muted px-2 py-1 rounded-md border border-border shadow-sm">
-                          #{o.id.slice(0, 8).toUpperCase()}
-                        </div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5" />
-                          {new Date(o.created_at).toLocaleString("id-ID", {
-                            dateStyle: "medium", timeStyle: "short"
-                          })}
-                        </div>
-                        <div className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border", statusConfig.bg, statusConfig.color, statusConfig.border)}>
-                          <StatusIcon className="h-3.5 w-3.5" />
-                          {statusConfig.label}
-                        </div>
-                      </div>
+                {/* Compact Header (Always Visible) */}
+                <div className="p-4 sm:p-5 pl-6 sm:pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-muted/10 transition-colors" onClick={() => toggleExpand(o.id)}>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="font-mono text-xs font-semibold text-muted-foreground bg-muted px-2 py-1 rounded-md border border-border shadow-sm">
+                      #{o.id.slice(0, 8).toUpperCase()}
+                    </div>
+                    <div className="text-sm font-bold text-foreground">{o.customer_name}</div>
+                    <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" />
+                      {new Date(o.created_at).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                    </div>
+                    <div className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border", statusConfig.bg, statusConfig.color, statusConfig.border)}>
+                      <StatusIcon className="h-3.5 w-3.5" />
+                      {statusConfig.label}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="font-display text-lg font-bold text-primary">{formatRupiah(Number(o.total))}</div>
+                    <button className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground">
+                      {isExpanded ? "Tutup" : "Lihat Detail"}
+                      <ChevronDown className={cn("h-4 w-4 transition-transform", isExpanded && "rotate-180")} />
+                    </button>
+                  </div>
+                </div>
 
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                          <div className="text-xs font-medium text-muted-foreground mb-1">Pelanggan</div>
-                          <div className="font-semibold text-foreground text-lg">{o.customer_name}</div>
-                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-                            <Phone className="h-3.5 w-3.5" />
-                            <a href={`https://wa.me/${o.phone.replace(/^0/, "62").replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="hover:text-primary hover:underline transition-colors font-medium">
+                {/* Expanded Details */}
+                {isExpanded && (
+                  <div className="border-t border-border bg-muted/10 p-5 sm:p-6 pl-6 sm:pl-8 animate-in slide-in-from-top-2 fade-in duration-200">
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                      {/* Order Info */}
+                      <div className="flex-1 space-y-4">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                              <Phone className="h-3.5 w-3.5" /> Nomor WhatsApp
+                            </div>
+                            <a href={`https://wa.me/${o.phone.replace(/^0/, "62").replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="text-sm font-semibold text-primary hover:underline" onClick={(e) => e.stopPropagation()}>
                               {o.phone}
                             </a>
                           </div>
-                        </div>
-                        
-                        <div>
-                          <div className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                            <MapPin className="h-3 w-3" /> Alamat & Catatan
-                          </div>
-                          {o.address ? (
-                            <p className="text-sm text-foreground line-clamp-2 leading-relaxed" title={o.address}>{o.address}</p>
-                          ) : (
-                            <p className="text-sm italic text-muted-foreground bg-muted/50 p-2 rounded-lg border border-border/50">Diambil di tempat (Pickup)</p>
-                          )}
-                          {o.notes && (
-                            <p className="mt-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 p-2.5 rounded-lg border border-amber-200 dark:border-amber-500/20 shadow-sm">
-                              <span className="font-semibold mr-1">Catatan:</span> {o.notes}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Order Items & Actions */}
-                    <div className="flex w-full flex-col gap-4 lg:w-[360px] shrink-0 border-t lg:border-t-0 lg:border-l border-border pt-4 lg:pt-0 lg:pl-6 bg-muted/20 lg:bg-transparent rounded-xl lg:rounded-none p-4 lg:p-0">
-                      <div className="space-y-3">
-                        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                          <ShoppingBag className="h-3.5 w-3.5" /> Ringkasan Pesanan
-                        </div>
-                        <div className="space-y-2.5 max-h-[140px] overflow-y-auto pr-2 scrollbar-thin">
-                          {o.order_items?.map((it, i) => (
-                            <div key={i} className="flex items-start justify-between gap-3 text-sm">
-                              <div className="flex-1 font-medium line-clamp-2">{it.name}</div>
-                              <div className="text-muted-foreground whitespace-nowrap bg-muted px-1.5 py-0.5 rounded text-xs">x{it.qty}</div>
-                              <div className="w-[90px] text-right font-semibold">{formatRupiah(Number(it.subtotal))}</div>
+                          
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                              <MapPin className="h-3 w-3" /> Alamat & Catatan
                             </div>
-                          ))}
-                        </div>
-                        <div className="flex items-center justify-between border-t border-dashed border-border pt-3 mt-1">
-                          <span className="font-semibold text-muted-foreground">Total Tagihan</span>
-                          <span className="font-display text-xl font-bold text-primary">{formatRupiah(Number(o.total))}</span>
+                            {o.address ? (
+                              <p className="text-sm text-foreground line-clamp-3 leading-relaxed">{o.address}</p>
+                            ) : (
+                              <p className="text-sm italic text-muted-foreground bg-background p-2 rounded-lg border border-border/50 shadow-sm inline-block">Diambil di tempat (Pickup)</p>
+                            )}
+                            {o.notes && (
+                              <p className="mt-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 p-2.5 rounded-lg border border-amber-200 dark:border-amber-500/20 shadow-sm">
+                                <span className="font-semibold mr-1">Catatan:</span> {o.notes}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 mt-auto pt-4">
-                        <div className="relative flex-1">
-                          <select 
-                            value={o.status} 
-                            onChange={(e) => setStatus(o.id, e.target.value)} 
-                            className="w-full appearance-none rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium outline-none transition-all hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                      {/* Order Items & Actions */}
+                      <div className="flex w-full flex-col gap-4 lg:w-[360px] shrink-0 border-t lg:border-t-0 lg:border-l border-border pt-4 lg:pt-0 lg:pl-6">
+                        <div className="space-y-3">
+                          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                            <ShoppingBag className="h-3.5 w-3.5" /> Item Pesanan
+                          </div>
+                          <div className="space-y-2.5 max-h-[200px] overflow-y-auto pr-2 scrollbar-thin">
+                            {o.order_items?.map((it, i) => (
+                              <div key={i} className="flex items-start justify-between gap-3 text-sm">
+                                <div className="flex-1 font-medium">{it.name}</div>
+                                <div className="text-muted-foreground whitespace-nowrap bg-background border border-border shadow-sm px-1.5 py-0.5 rounded text-xs">x{it.qty}</div>
+                                <div className="w-[90px] text-right font-semibold">{formatRupiah(Number(it.subtotal))}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-auto pt-4 border-t border-dashed border-border">
+                          <div className="relative flex-1">
+                            <select 
+                              value={o.status} 
+                              onChange={(e) => setStatus(o.id, e.target.value)} 
+                              className="w-full appearance-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium outline-none transition-all hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                            >
+                              {STATUSES.map((s) => <option key={s} value={s}>Ubah Status: {STATUS_UI[s].label}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          </div>
+                          <button 
+                            onClick={() => remove(o.id)} 
+                            className="flex items-center justify-center h-[42px] w-[42px] rounded-xl border border-destructive/20 text-destructive bg-background hover:bg-destructive hover:text-destructive-foreground transition-colors shadow-sm"
+                            title="Hapus Pesanan"
                           >
-                            {STATUSES.map((s) => <option key={s} value={s}>Ubah Status: {STATUS_UI[s].label}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </div>
-                        <button 
-                          onClick={() => remove(o.id)} 
-                          className="flex items-center justify-center h-[42px] w-[42px] rounded-xl border border-destructive/20 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors shadow-sm"
-                          title="Hapus Pesanan"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
                       </div>
-                    </div>
 
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           })

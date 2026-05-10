@@ -32,10 +32,12 @@ function CartPage() {
   const remove = useCart((s) => s.remove);
   const clear = useCart((s) => s.clear);
   const subtotal = useCart((s) => s.total());
-  const total = subtotal + (items.length > 0 ? ONGKIR : 0);
-
   const [form, setForm] = useState({ name: "", phone: "", address: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [isPickup, setIsPickup] = useState(false);
+
+  const ongkirAmount = isPickup ? 0 : ONGKIR;
+  const total = subtotal + (items.length > 0 ? ongkirAmount : 0);
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
@@ -51,7 +53,7 @@ function CartPage() {
         .insert({
           customer_name: parsed.data.name,
           phone: parsed.data.phone,
-          address: parsed.data.address ?? null,
+          address: isPickup ? null : (parsed.data.address ?? null),
           notes: parsed.data.notes ?? null,
           total,
           status: "pending",
@@ -72,9 +74,11 @@ function CartPage() {
       const lines = items.map((i) => `• ${i.name} x${i.qty} — ${formatRupiah(i.price * i.qty)}`).join("%0A");
       const msg =
         `Halo ${SITE_CONFIG.shortName}! Saya ingin pesan:%0A%0A${lines}%0A%0A` +
-        `Subtotal: ${formatRupiah(subtotal)}%0AOngkir: ${formatRupiah(ONGKIR)}%0A*Total: ${formatRupiah(total)}*%0A%0A` +
+        `Subtotal: ${formatRupiah(subtotal)}%0A` +
+        (isPickup ? `Metode: Ambil Sendiri (Pickup)%0A` : `Ongkir: ${formatRupiah(ONGKIR)}%0A`) +
+        `*Total: ${formatRupiah(total)}*%0A%0A` +
         `Nama: ${parsed.data.name}%0AHP: ${parsed.data.phone}` +
-        (parsed.data.address ? `%0AAlamat: ${parsed.data.address}` : "") +
+        (!isPickup && parsed.data.address ? `%0AAlamat: ${parsed.data.address}` : "") +
         (parsed.data.notes ? `%0ACatatan: ${parsed.data.notes}` : "") +
         `%0A%0AOrder ID: ${order.id.slice(0, 8)}`;
 
@@ -143,7 +147,10 @@ function CartPage() {
             <h2 className="font-display text-xl font-bold">Ringkasan Belanja</h2>
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatRupiah(subtotal)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Ongkir</span><span>{formatRupiah(ONGKIR)}</span></div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Ongkir</span>
+                {isPickup ? <span className="text-primary font-medium">Gratis (Pickup)</span> : <span>{formatRupiah(ONGKIR)}</span>}
+              </div>
               <div className="mt-3 flex justify-between border-t border-border pt-3 text-base font-bold">
                 <span>Total</span><span className="text-primary">{formatRupiah(total)}</span>
               </div>
@@ -152,10 +159,26 @@ function CartPage() {
 
           <div className="rounded-2xl border border-border bg-card p-6">
             <h2 className="font-display text-xl font-bold">Data Pemesan</h2>
-            <div className="mt-4 space-y-3">
+            
+            <div className="mt-4 flex gap-2 p-1 bg-muted rounded-xl">
+              <button 
+                onClick={() => setIsPickup(false)}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${!isPickup ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                Pesan Antar
+              </button>
+              <button 
+                onClick={() => setIsPickup(true)}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${isPickup ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                Ambil Sendiri
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-3">
               <Field label="Nama Lengkap" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
               <Field label="Nomor WhatsApp" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="08xx" />
-              <Field label="Alamat (opsional)" value={form.address} onChange={(v) => setForm({ ...form, address: v })} textarea />
+              {!isPickup && <Field label="Alamat Pengiriman (opsional)" value={form.address} onChange={(v) => setForm({ ...form, address: v })} textarea />}
               <Field label="Catatan (opsional)" value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} textarea />
             </div>
             <button
