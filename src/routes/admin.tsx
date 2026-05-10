@@ -54,7 +54,7 @@ function AdminLayout() {
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as never}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
                   active ? "bg-primary text-primary-foreground" : "text-foreground/80 hover:bg-sidebar-accent",
@@ -82,7 +82,7 @@ function AdminLayout() {
           {items.slice(0, 4).map((item) => {
             const active = item.exact ? path === item.to : path.startsWith(item.to);
             return (
-              <Link key={item.to} to={item.to} className={cn("flex flex-col items-center gap-1 rounded-md py-1 text-[10px]", active ? "text-primary" : "text-muted-foreground")}>
+              <Link key={item.to} to={item.to as never} className={cn("flex flex-col items-center gap-1 rounded-md py-1 text-[10px]", active ? "text-primary" : "text-muted-foreground")}>
                 <item.icon className="h-4 w-4" /> {item.label.split(" ")[0]}
               </Link>
             );
