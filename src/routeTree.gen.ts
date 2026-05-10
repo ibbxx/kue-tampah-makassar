@@ -9,61 +9,462 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as SiteRouteImport } from './routes/_site'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as SiteIndexRouteImport } from './routes/_site.index'
+import { Route as AdminStokRouteImport } from './routes/admin.stok'
+import { Route as AdminProdukRouteImport } from './routes/admin.produk'
+import { Route as AdminPesanRouteImport } from './routes/admin.pesan'
+import { Route as AdminPanduanRouteImport } from './routes/admin.panduan'
+import { Route as AdminOrderRouteImport } from './routes/admin.order'
+import { Route as AdminKategoriRouteImport } from './routes/admin.kategori'
+import { Route as AdminArtikelRouteImport } from './routes/admin.artikel'
+import { Route as SiteTentangRouteImport } from './routes/_site.tentang'
+import { Route as SiteProdukRouteImport } from './routes/_site.produk'
+import { Route as SiteKontakRouteImport } from './routes/_site.kontak'
+import { Route as SiteKeranjangRouteImport } from './routes/_site.keranjang'
+import { Route as SiteArtikelRouteImport } from './routes/_site.artikel'
+import { Route as SiteProdukSlugRouteImport } from './routes/_site.produk.$slug'
+import { Route as SiteArtikelSlugRouteImport } from './routes/_site.artikel.$slug'
 
-const IndexRoute = IndexRouteImport.update({
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteRoute = SiteRouteImport.update({
+  id: '/_site',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AdminRoute,
+} as any)
+const SiteIndexRoute = SiteIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SiteRoute,
+} as any)
+const AdminStokRoute = AdminStokRouteImport.update({
+  id: '/stok',
+  path: '/stok',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProdukRoute = AdminProdukRouteImport.update({
+  id: '/produk',
+  path: '/produk',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPesanRoute = AdminPesanRouteImport.update({
+  id: '/pesan',
+  path: '/pesan',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPanduanRoute = AdminPanduanRouteImport.update({
+  id: '/panduan',
+  path: '/panduan',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrderRoute = AdminOrderRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminKategoriRoute = AdminKategoriRouteImport.update({
+  id: '/kategori',
+  path: '/kategori',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminArtikelRoute = AdminArtikelRouteImport.update({
+  id: '/artikel',
+  path: '/artikel',
+  getParentRoute: () => AdminRoute,
+} as any)
+const SiteTentangRoute = SiteTentangRouteImport.update({
+  id: '/tentang',
+  path: '/tentang',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteProdukRoute = SiteProdukRouteImport.update({
+  id: '/produk',
+  path: '/produk',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteKontakRoute = SiteKontakRouteImport.update({
+  id: '/kontak',
+  path: '/kontak',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteKeranjangRoute = SiteKeranjangRouteImport.update({
+  id: '/keranjang',
+  path: '/keranjang',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteArtikelRoute = SiteArtikelRouteImport.update({
+  id: '/artikel',
+  path: '/artikel',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteProdukSlugRoute = SiteProdukSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => SiteProdukRoute,
+} as any)
+const SiteArtikelSlugRoute = SiteArtikelSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => SiteArtikelRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof SiteIndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/login': typeof LoginRoute
+  '/artikel': typeof SiteArtikelRouteWithChildren
+  '/keranjang': typeof SiteKeranjangRoute
+  '/kontak': typeof SiteKontakRoute
+  '/produk': typeof SiteProdukRouteWithChildren
+  '/tentang': typeof SiteTentangRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/order': typeof AdminOrderRoute
+  '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pesan': typeof AdminPesanRoute
+  '/admin/produk': typeof AdminProdukRoute
+  '/admin/stok': typeof AdminStokRoute
+  '/admin/': typeof AdminIndexRoute
+  '/artikel/$slug': typeof SiteArtikelSlugRoute
+  '/produk/$slug': typeof SiteProdukSlugRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/artikel': typeof SiteArtikelRouteWithChildren
+  '/keranjang': typeof SiteKeranjangRoute
+  '/kontak': typeof SiteKontakRoute
+  '/produk': typeof SiteProdukRouteWithChildren
+  '/tentang': typeof SiteTentangRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/order': typeof AdminOrderRoute
+  '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pesan': typeof AdminPesanRoute
+  '/admin/produk': typeof AdminProdukRoute
+  '/admin/stok': typeof AdminStokRoute
+  '/': typeof SiteIndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/artikel/$slug': typeof SiteArtikelSlugRoute
+  '/produk/$slug': typeof SiteProdukSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_site': typeof SiteRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_site/artikel': typeof SiteArtikelRouteWithChildren
+  '/_site/keranjang': typeof SiteKeranjangRoute
+  '/_site/kontak': typeof SiteKontakRoute
+  '/_site/produk': typeof SiteProdukRouteWithChildren
+  '/_site/tentang': typeof SiteTentangRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/order': typeof AdminOrderRoute
+  '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pesan': typeof AdminPesanRoute
+  '/admin/produk': typeof AdminProdukRoute
+  '/admin/stok': typeof AdminStokRoute
+  '/_site/': typeof SiteIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/_site/artikel/$slug': typeof SiteArtikelSlugRoute
+  '/_site/produk/$slug': typeof SiteProdukSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/artikel'
+    | '/keranjang'
+    | '/kontak'
+    | '/produk'
+    | '/tentang'
+    | '/admin/artikel'
+    | '/admin/kategori'
+    | '/admin/order'
+    | '/admin/panduan'
+    | '/admin/pesan'
+    | '/admin/produk'
+    | '/admin/stok'
+    | '/admin/'
+    | '/artikel/$slug'
+    | '/produk/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/login'
+    | '/artikel'
+    | '/keranjang'
+    | '/kontak'
+    | '/produk'
+    | '/tentang'
+    | '/admin/artikel'
+    | '/admin/kategori'
+    | '/admin/order'
+    | '/admin/panduan'
+    | '/admin/pesan'
+    | '/admin/produk'
+    | '/admin/stok'
+    | '/'
+    | '/admin'
+    | '/artikel/$slug'
+    | '/produk/$slug'
+  id:
+    | '__root__'
+    | '/_site'
+    | '/admin'
+    | '/login'
+    | '/_site/artikel'
+    | '/_site/keranjang'
+    | '/_site/kontak'
+    | '/_site/produk'
+    | '/_site/tentang'
+    | '/admin/artikel'
+    | '/admin/kategori'
+    | '/admin/order'
+    | '/admin/panduan'
+    | '/admin/pesan'
+    | '/admin/produk'
+    | '/admin/stok'
+    | '/_site/'
+    | '/admin/'
+    | '/_site/artikel/$slug'
+    | '/_site/produk/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  SiteRoute: typeof SiteRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_site': {
+      id: '/_site'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof SiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_site/': {
+      id: '/_site/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof SiteIndexRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/admin/stok': {
+      id: '/admin/stok'
+      path: '/stok'
+      fullPath: '/admin/stok'
+      preLoaderRoute: typeof AdminStokRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/produk': {
+      id: '/admin/produk'
+      path: '/produk'
+      fullPath: '/admin/produk'
+      preLoaderRoute: typeof AdminProdukRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pesan': {
+      id: '/admin/pesan'
+      path: '/pesan'
+      fullPath: '/admin/pesan'
+      preLoaderRoute: typeof AdminPesanRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/panduan': {
+      id: '/admin/panduan'
+      path: '/panduan'
+      fullPath: '/admin/panduan'
+      preLoaderRoute: typeof AdminPanduanRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/order': {
+      id: '/admin/order'
+      path: '/order'
+      fullPath: '/admin/order'
+      preLoaderRoute: typeof AdminOrderRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/kategori': {
+      id: '/admin/kategori'
+      path: '/kategori'
+      fullPath: '/admin/kategori'
+      preLoaderRoute: typeof AdminKategoriRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/artikel': {
+      id: '/admin/artikel'
+      path: '/artikel'
+      fullPath: '/admin/artikel'
+      preLoaderRoute: typeof AdminArtikelRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_site/tentang': {
+      id: '/_site/tentang'
+      path: '/tentang'
+      fullPath: '/tentang'
+      preLoaderRoute: typeof SiteTentangRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/produk': {
+      id: '/_site/produk'
+      path: '/produk'
+      fullPath: '/produk'
+      preLoaderRoute: typeof SiteProdukRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/kontak': {
+      id: '/_site/kontak'
+      path: '/kontak'
+      fullPath: '/kontak'
+      preLoaderRoute: typeof SiteKontakRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/keranjang': {
+      id: '/_site/keranjang'
+      path: '/keranjang'
+      fullPath: '/keranjang'
+      preLoaderRoute: typeof SiteKeranjangRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/artikel': {
+      id: '/_site/artikel'
+      path: '/artikel'
+      fullPath: '/artikel'
+      preLoaderRoute: typeof SiteArtikelRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/produk/$slug': {
+      id: '/_site/produk/$slug'
+      path: '/$slug'
+      fullPath: '/produk/$slug'
+      preLoaderRoute: typeof SiteProdukSlugRouteImport
+      parentRoute: typeof SiteProdukRoute
+    }
+    '/_site/artikel/$slug': {
+      id: '/_site/artikel/$slug'
+      path: '/$slug'
+      fullPath: '/artikel/$slug'
+      preLoaderRoute: typeof SiteArtikelSlugRouteImport
+      parentRoute: typeof SiteArtikelRoute
     }
   }
 }
 
+interface SiteArtikelRouteChildren {
+  SiteArtikelSlugRoute: typeof SiteArtikelSlugRoute
+}
+
+const SiteArtikelRouteChildren: SiteArtikelRouteChildren = {
+  SiteArtikelSlugRoute: SiteArtikelSlugRoute,
+}
+
+const SiteArtikelRouteWithChildren = SiteArtikelRoute._addFileChildren(
+  SiteArtikelRouteChildren,
+)
+
+interface SiteProdukRouteChildren {
+  SiteProdukSlugRoute: typeof SiteProdukSlugRoute
+}
+
+const SiteProdukRouteChildren: SiteProdukRouteChildren = {
+  SiteProdukSlugRoute: SiteProdukSlugRoute,
+}
+
+const SiteProdukRouteWithChildren = SiteProdukRoute._addFileChildren(
+  SiteProdukRouteChildren,
+)
+
+interface SiteRouteChildren {
+  SiteArtikelRoute: typeof SiteArtikelRouteWithChildren
+  SiteKeranjangRoute: typeof SiteKeranjangRoute
+  SiteKontakRoute: typeof SiteKontakRoute
+  SiteProdukRoute: typeof SiteProdukRouteWithChildren
+  SiteTentangRoute: typeof SiteTentangRoute
+  SiteIndexRoute: typeof SiteIndexRoute
+}
+
+const SiteRouteChildren: SiteRouteChildren = {
+  SiteArtikelRoute: SiteArtikelRouteWithChildren,
+  SiteKeranjangRoute: SiteKeranjangRoute,
+  SiteKontakRoute: SiteKontakRoute,
+  SiteProdukRoute: SiteProdukRouteWithChildren,
+  SiteTentangRoute: SiteTentangRoute,
+  SiteIndexRoute: SiteIndexRoute,
+}
+
+const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
+
+interface AdminRouteChildren {
+  AdminArtikelRoute: typeof AdminArtikelRoute
+  AdminKategoriRoute: typeof AdminKategoriRoute
+  AdminOrderRoute: typeof AdminOrderRoute
+  AdminPanduanRoute: typeof AdminPanduanRoute
+  AdminPesanRoute: typeof AdminPesanRoute
+  AdminProdukRoute: typeof AdminProdukRoute
+  AdminStokRoute: typeof AdminStokRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminArtikelRoute: AdminArtikelRoute,
+  AdminKategoriRoute: AdminKategoriRoute,
+  AdminOrderRoute: AdminOrderRoute,
+  AdminPanduanRoute: AdminPanduanRoute,
+  AdminPesanRoute: AdminPesanRoute,
+  AdminProdukRoute: AdminProdukRoute,
+  AdminStokRoute: AdminStokRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  SiteRoute: SiteRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
