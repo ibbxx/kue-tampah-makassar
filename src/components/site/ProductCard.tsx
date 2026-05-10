@@ -20,7 +20,8 @@ export function ProductCard({ product }: { product: Product }) {
       toast.error("Stok habis");
       return;
     }
-    add({ productId: product.id, name: product.name, price: Number(product.price), image: product.image_url });
+    const firstImage = product.image_url ? product.image_url.split(",")[0] : null;
+    add({ productId: product.id, name: product.name, price: Number(product.price), image: firstImage });
     toast.success(`${product.name} ditambahkan ke keranjang`);
     setOpen(false); // Close the popup after adding
   };
@@ -34,7 +35,7 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="relative aspect-square w-full overflow-hidden bg-muted">
             {product.image_url ? (
               <img
-                src={product.image_url}
+                src={product.image_url.split(",")[0]}
                 alt={product.name}
                 className="h-full w-full object-cover transition group-hover:scale-105"
                 loading="lazy"
@@ -86,13 +87,20 @@ export function ProductCard({ product }: { product: Product }) {
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
-          <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+          <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted relative">
             {product.image_url ? (
-              <img
-                src={product.image_url}
-                alt={product.name}
-                className="h-full w-full object-cover"
-              />
+              <>
+                <img
+                  src={product.image_url.split(",")[0]}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                />
+                {product.image_url.split(",").length > 1 && (
+                  <span className="absolute bottom-2 right-2 rounded-md bg-black/60 px-2 py-1 text-xs text-white">
+                    +{product.image_url.split(",").length - 1} foto lain
+                  </span>
+                )}
+              </>
             ) : (
               <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                 <ImageOff className="h-10 w-10" />

@@ -22,6 +22,8 @@ function ProductDetail() {
   const [qty, setQty] = useState(1);
   const add = useCart((s) => s.add);
 
+  const [activeImage, setActiveImage] = useState(0);
+
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
@@ -42,9 +44,11 @@ function ProductDetail() {
     );
   }
 
+  const images = product.image_url ? product.image_url.split(",").filter(Boolean) : [];
+
   const handleAdd = () => {
     if (product.stock <= 0) return toast.error("Stok habis");
-    add({ productId: product.id, name: product.name, price: Number(product.price), image: product.image_url }, qty);
+    add({ productId: product.id, name: product.name, price: Number(product.price), image: images.length > 0 ? images[0] : null }, qty);
     toast.success(`${product.name} (${qty}x) ditambahkan`);
   };
   const handleBuy = () => {
@@ -63,16 +67,33 @@ function ProductDetail() {
       </nav>
 
       <div className="mt-6 grid gap-10 md:grid-cols-2">
-        <div className="overflow-hidden rounded-2xl border border-border bg-muted">
-          <div className="aspect-square">
-            {product.image_url ? (
-              <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full items-center justify-center text-muted-foreground">
-                <ImageOff className="h-16 w-16" />
-              </div>
-            )}
+        <div className="flex flex-col gap-4">
+          <div className="overflow-hidden rounded-2xl border border-border bg-muted">
+            <div className="aspect-square">
+              {images.length > 0 ? (
+                <img src={images[activeImage]} alt={product.name} className="h-full w-full object-cover transition-all" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <ImageOff className="h-16 w-16" />
+                </div>
+              )}
+            </div>
           </div>
+          {images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveImage(i)}
+                  className={`relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                    activeImage === i ? "border-primary shadow-sm" : "border-transparent opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <img src={img} alt={`Thumbnail ${i+1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>

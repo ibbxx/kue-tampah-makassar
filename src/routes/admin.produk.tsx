@@ -92,13 +92,21 @@ function ProductAdmin() {
         .from('product-images')
         .getPublicUrl(filePath);
 
-      setEditing({ ...editing, image_url: publicUrl });
+      const images = editing.image_url ? editing.image_url.split(",").filter(Boolean) : [];
+      setEditing({ ...editing, image_url: [...images, publicUrl].join(",") });
       toast.success("Gambar berhasil diunggah");
     } catch (error: any) {
       toast.error("Gagal mengunggah: " + error.message);
     } finally {
       setUploading(false);
     }
+  };
+
+  const removeImage = (index: number) => {
+    if (!editing) return;
+    const images = editing.image_url ? editing.image_url.split(",").filter(Boolean) : [];
+    images.splice(index, 1);
+    setEditing({ ...editing, image_url: images.length > 0 ? images.join(",") : null });
   };
 
   const handleCategoryUpload = async (file: File) => {
@@ -236,10 +244,31 @@ function ProductAdmin() {
                 {/* Left Column: Image Preview & Visibility */}
                 <div className="space-y-6 md:col-span-1">
                   <div>
-                    <h3 className="mb-3 text-sm font-semibold text-foreground">Media Produk</h3>
+                    <h3 className="mb-3 text-sm font-semibold text-foreground flex items-center justify-between">
+                      Media Produk
+                      <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Bisa lebih dari 1</span>
+                    </h3>
+                    
+                    {/* Daftar Gambar (Grid) */}
+                    {(editing.image_url ? editing.image_url.split(",").filter(Boolean) : []).length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        {(editing.image_url ? editing.image_url.split(",").filter(Boolean) : []).map((url, i) => (
+                          <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+                            <img src={url} alt={`Preview ${i+1}`} className="h-full w-full object-cover transition-transform group-hover:scale-110" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                              <button type="button" onClick={() => removeImage(i)} className="rounded-full bg-destructive p-1.5 text-destructive-foreground shadow-sm hover:scale-110 transition-transform">
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Tombol Upload */}
                     <div 
                       className={cn(
-                        "group relative aspect-square overflow-hidden rounded-xl border-2 border-dashed transition-all",
+                        "group relative flex aspect-video cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-all",
                         uploading ? "border-primary bg-primary/5" : "border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/50"
                       )}
                       onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('border-primary', 'bg-primary/5'); }}
@@ -253,31 +282,21 @@ function ProductAdmin() {
                     >
                       {uploading ? (
                         <div className="flex h-full flex-col items-center justify-center text-primary">
-                          <Loader2 className="h-10 w-10 animate-spin" />
-                          <span className="mt-2 text-xs font-medium">Mengunggah & Kompres...</span>
+                          <Loader2 className="h-6 w-6 animate-spin" />
+                          <span className="mt-2 text-[10px] font-medium">Mengunggah...</span>
                         </div>
-                      ) : editing.image_url ? (
-                        <>
-                          <img src={editing.image_url} alt="Preview" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                            <label className="flex cursor-pointer flex-col items-center text-white">
-                              <UploadCloud className="h-8 w-8" />
-                              <span className="mt-1 text-xs font-medium">Ganti Gambar</span>
-                              <input type="file" className="hidden" accept="image/*" onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} />
-                            </label>
-                          </div>
-                        </>
                       ) : (
-                        <label className="flex h-full cursor-pointer flex-col items-center justify-center text-muted-foreground transition-colors hover:text-primary">
-                          <UploadCloud className="mb-2 h-10 w-10 opacity-50" />
+                        <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-muted-foreground transition-colors hover:text-primary p-4">
+                          <UploadCloud className="mb-2 h-8 w-8 opacity-50" />
                           <span className="text-sm font-medium">Klik atau Drag & Drop</span>
-                          <span className="mt-1 text-[10px]">PNG, JPG up to 10MB (Auto Compress)</span>
+                          <span className="mt-1 text-[10px] text-center">PNG, JPG up to 10MB (Auto Compress)</span>
                           <input type="file" className="hidden" accept="image/*" onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} />
                         </label>
                       )}
                     </div>
+                    
                     <div className="mt-4">
-                      <Field label="URL Gambar (Opsional)" value={editing.image_url ?? ""} onChange={(v) => setEditing({ ...editing, image_url: v })} placeholder="https://..." />
+                      <Field label="URL Gambar (Pisahkan dengan koma jika lebih dari 1)" value={editing.image_url ?? ""} onChange={(v) => setEditing({ ...editing, image_url: v })} placeholder="https://url1.jpg,https://url2.jpg" />
                     </div>
                   </div>
 

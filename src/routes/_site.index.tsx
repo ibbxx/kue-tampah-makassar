@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles, ShieldCheck, Truck, Package, ChevronDown } from "lucide-react";
 import { supabase, type Product, type Category, type HomepageHero } from "@/lib/supabase";
 import { ProductCard } from "@/components/site/ProductCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
 
 export const Route = createFileRoute("/_site/")({
@@ -103,6 +103,17 @@ function HomePage() {
   });
 
   const hero = heroContent ?? defaultHero;
+  const heroImages = hero.image_url ? hero.image_url.split(",").filter(Boolean) : [];
+  const [currentHeroImage, setCurrentHeroImage] = useState(0);
+
+  useEffect(() => {
+    if (heroImages.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentHeroImage((prev) => (prev + 1) % heroImages.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [heroImages.length]);
 
   return (
     <div>
@@ -110,8 +121,15 @@ function HomePage() {
       <section className="relative flex min-h-[90vh] items-center overflow-hidden md:min-h-screen">
         {/* Fullscreen Image Background */}
         <div className="absolute inset-0 z-0 bg-zinc-950">
-          {hero.image_url ? (
-            <img src={hero.image_url} alt={hero.image_alt} className="h-full w-full object-cover" />
+          {heroImages.length > 0 ? (
+            heroImages.map((img, i) => (
+              <img 
+                key={i} 
+                src={img} 
+                alt={`${hero.image_alt} ${i + 1}`} 
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === currentHeroImage ? "opacity-100" : "opacity-0"}`} 
+              />
+            ))
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 via-zinc-900 to-zinc-950">
                <div className="font-display text-8xl font-bold text-white/5">{SITE_CONFIG.shortName}</div>

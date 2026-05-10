@@ -92,13 +92,20 @@ function HeroAdmin() {
         data: { publicUrl },
       } = supabase.storage.from("site-images").getPublicUrl(filePath);
 
-      update("image_url", publicUrl);
+      const images = form.image_url ? form.image_url.split(",").filter(Boolean) : [];
+      update("image_url", [...images, publicUrl].join(","));
       toast.success("Gambar hero berhasil diunggah");
     } catch (error: any) {
       toast.error("Gagal mengunggah gambar: " + error.message);
     } finally {
       setUploading(false);
     }
+  };
+
+  const removeImage = (index: number) => {
+    const images = form.image_url ? form.image_url.split(",").filter(Boolean) : [];
+    images.splice(index, 1);
+    update("image_url", images.length > 0 ? images.join(",") : null);
   };
 
   const save = async () => {
@@ -216,12 +223,30 @@ function HeroAdmin() {
 
           <div className="space-y-5">
             <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <ImageIcon className="h-4 w-4 text-primary" /> Gambar Hero
+              <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground justify-between">
+                <span className="flex items-center gap-2"><ImageIcon className="h-4 w-4 text-primary" /> Gambar Hero</span>
+                <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Bisa lebih dari 1</span>
               </h2>
+              
+              {/* Daftar Gambar (Grid) */}
+              {(form.image_url ? form.image_url.split(",").filter(Boolean) : []).length > 0 && (
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  {(form.image_url ? form.image_url.split(",").filter(Boolean) : []).map((url, i) => (
+                    <div key={i} className="group relative aspect-video overflow-hidden rounded-lg border border-border">
+                      <img src={url} alt={`Preview ${i+1}`} className="h-full w-full object-cover transition-transform group-hover:scale-110" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button type="button" onClick={() => removeImage(i)} className="rounded-full bg-destructive p-1.5 text-destructive-foreground shadow-sm hover:scale-110 transition-transform">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div
                 className={cn(
-                  "mt-4 aspect-[4/3] overflow-hidden rounded-xl border-2 border-dashed transition",
+                  "mt-4 flex aspect-video cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition",
                   uploading ? "border-primary bg-primary/5" : "border-border bg-muted/30 hover:border-primary/50",
                 )}
                 onDragOver={(event) => {
@@ -241,38 +266,14 @@ function HeroAdmin() {
               >
                 {uploading ? (
                   <div className="flex h-full flex-col items-center justify-center text-primary">
-                    <Loader2 className="h-10 w-10 animate-spin" />
-                    <span className="mt-2 text-xs font-medium">Mengunggah & kompres...</span>
-                  </div>
-                ) : form.image_url ? (
-                  <div className="group relative h-full">
-                    <img src={form.image_url} alt={form.image_alt} className="h-full w-full object-cover" />
-                    <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
-                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-background px-4 py-2 text-xs font-semibold text-foreground shadow">
-                        <UploadCloud className="h-4 w-4" />
-                        Ganti
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={(event) => event.target.files?.[0] && handleUpload(event.target.files[0])}
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => update("image_url", null)}
-                        className="inline-flex items-center gap-2 rounded-full bg-destructive px-4 py-2 text-xs font-semibold text-destructive-foreground shadow"
-                      >
-                        <X className="h-4 w-4" />
-                        Hapus
-                      </button>
-                    </div>
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span className="mt-2 text-[10px] font-medium">Mengunggah...</span>
                   </div>
                 ) : (
-                  <label className="flex h-full cursor-pointer flex-col items-center justify-center px-6 text-center text-muted-foreground transition hover:text-primary">
-                    <UploadCloud className="mb-2 h-10 w-10 opacity-60" />
+                  <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center px-6 text-center text-muted-foreground transition hover:text-primary">
+                    <UploadCloud className="mb-2 h-8 w-8 opacity-60" />
                     <span className="text-sm font-medium">Klik atau drag gambar</span>
-                    <span className="mt-1 text-[11px]">PNG, JPG, atau WebP akan dikompres otomatis</span>
+                    <span className="mt-1 text-[11px]">PNG, JPG, atau WebP</span>
                     <input
                       type="file"
                       className="hidden"
