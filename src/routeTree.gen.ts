@@ -22,10 +22,10 @@ import { Route as AdminOrderRouteImport } from './routes/admin.order'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminArtikelRouteImport } from './routes/admin.artikel'
 import { Route as SiteTentangRouteImport } from './routes/_site.tentang'
-import { Route as SiteProdukRouteImport } from './routes/_site.produk'
 import { Route as SiteKontakRouteImport } from './routes/_site.kontak'
 import { Route as SiteKeranjangRouteImport } from './routes/_site.keranjang'
 import { Route as SiteArtikelRouteImport } from './routes/_site.artikel'
+import { Route as SiteProdukIndexRouteImport } from './routes/_site.produk.index'
 import { Route as SiteProdukSlugRouteImport } from './routes/_site.produk.$slug'
 import { Route as SiteArtikelSlugRouteImport } from './routes/_site.artikel.$slug'
 
@@ -93,11 +93,6 @@ const SiteTentangRoute = SiteTentangRouteImport.update({
   path: '/tentang',
   getParentRoute: () => SiteRoute,
 } as any)
-const SiteProdukRoute = SiteProdukRouteImport.update({
-  id: '/produk',
-  path: '/produk',
-  getParentRoute: () => SiteRoute,
-} as any)
 const SiteKontakRoute = SiteKontakRouteImport.update({
   id: '/kontak',
   path: '/kontak',
@@ -113,10 +108,15 @@ const SiteArtikelRoute = SiteArtikelRouteImport.update({
   path: '/artikel',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteProdukIndexRoute = SiteProdukIndexRouteImport.update({
+  id: '/produk/',
+  path: '/produk/',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteProdukSlugRoute = SiteProdukSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => SiteProdukRoute,
+  id: '/produk/$slug',
+  path: '/produk/$slug',
+  getParentRoute: () => SiteRoute,
 } as any)
 const SiteArtikelSlugRoute = SiteArtikelSlugRouteImport.update({
   id: '/$slug',
@@ -131,7 +131,6 @@ export interface FileRoutesByFullPath {
   '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
-  '/produk': typeof SiteProdukRouteWithChildren
   '/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/hero': typeof AdminHeroRoute
@@ -143,13 +142,13 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
   '/produk/$slug': typeof SiteProdukSlugRoute
+  '/produk/': typeof SiteProdukIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
-  '/produk': typeof SiteProdukRouteWithChildren
   '/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/hero': typeof AdminHeroRoute
@@ -162,6 +161,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
   '/produk/$slug': typeof SiteProdukSlugRoute
+  '/produk': typeof SiteProdukIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -171,7 +171,6 @@ export interface FileRoutesById {
   '/_site/artikel': typeof SiteArtikelRouteWithChildren
   '/_site/keranjang': typeof SiteKeranjangRoute
   '/_site/kontak': typeof SiteKontakRoute
-  '/_site/produk': typeof SiteProdukRouteWithChildren
   '/_site/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/hero': typeof AdminHeroRoute
@@ -184,6 +183,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/_site/artikel/$slug': typeof SiteArtikelSlugRoute
   '/_site/produk/$slug': typeof SiteProdukSlugRoute
+  '/_site/produk/': typeof SiteProdukIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -194,7 +194,6 @@ export interface FileRouteTypes {
     | '/artikel'
     | '/keranjang'
     | '/kontak'
-    | '/produk'
     | '/tentang'
     | '/admin/artikel'
     | '/admin/hero'
@@ -206,13 +205,13 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/artikel/$slug'
     | '/produk/$slug'
+    | '/produk/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/artikel'
     | '/keranjang'
     | '/kontak'
-    | '/produk'
     | '/tentang'
     | '/admin/artikel'
     | '/admin/hero'
@@ -225,6 +224,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/artikel/$slug'
     | '/produk/$slug'
+    | '/produk'
   id:
     | '__root__'
     | '/_site'
@@ -233,7 +233,6 @@ export interface FileRouteTypes {
     | '/_site/artikel'
     | '/_site/keranjang'
     | '/_site/kontak'
-    | '/_site/produk'
     | '/_site/tentang'
     | '/admin/artikel'
     | '/admin/hero'
@@ -246,6 +245,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/_site/artikel/$slug'
     | '/_site/produk/$slug'
+    | '/_site/produk/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -347,13 +347,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteTentangRouteImport
       parentRoute: typeof SiteRoute
     }
-    '/_site/produk': {
-      id: '/_site/produk'
-      path: '/produk'
-      fullPath: '/produk'
-      preLoaderRoute: typeof SiteProdukRouteImport
-      parentRoute: typeof SiteRoute
-    }
     '/_site/kontak': {
       id: '/_site/kontak'
       path: '/kontak'
@@ -375,12 +368,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteArtikelRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/produk/': {
+      id: '/_site/produk/'
+      path: '/produk'
+      fullPath: '/produk/'
+      preLoaderRoute: typeof SiteProdukIndexRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/produk/$slug': {
       id: '/_site/produk/$slug'
-      path: '/$slug'
+      path: '/produk/$slug'
       fullPath: '/produk/$slug'
       preLoaderRoute: typeof SiteProdukSlugRouteImport
-      parentRoute: typeof SiteProdukRoute
+      parentRoute: typeof SiteRoute
     }
     '/_site/artikel/$slug': {
       id: '/_site/artikel/$slug'
@@ -404,34 +404,24 @@ const SiteArtikelRouteWithChildren = SiteArtikelRoute._addFileChildren(
   SiteArtikelRouteChildren,
 )
 
-interface SiteProdukRouteChildren {
-  SiteProdukSlugRoute: typeof SiteProdukSlugRoute
-}
-
-const SiteProdukRouteChildren: SiteProdukRouteChildren = {
-  SiteProdukSlugRoute: SiteProdukSlugRoute,
-}
-
-const SiteProdukRouteWithChildren = SiteProdukRoute._addFileChildren(
-  SiteProdukRouteChildren,
-)
-
 interface SiteRouteChildren {
   SiteArtikelRoute: typeof SiteArtikelRouteWithChildren
   SiteKeranjangRoute: typeof SiteKeranjangRoute
   SiteKontakRoute: typeof SiteKontakRoute
-  SiteProdukRoute: typeof SiteProdukRouteWithChildren
   SiteTentangRoute: typeof SiteTentangRoute
   SiteIndexRoute: typeof SiteIndexRoute
+  SiteProdukSlugRoute: typeof SiteProdukSlugRoute
+  SiteProdukIndexRoute: typeof SiteProdukIndexRoute
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
   SiteArtikelRoute: SiteArtikelRouteWithChildren,
   SiteKeranjangRoute: SiteKeranjangRoute,
   SiteKontakRoute: SiteKontakRoute,
-  SiteProdukRoute: SiteProdukRouteWithChildren,
   SiteTentangRoute: SiteTentangRoute,
   SiteIndexRoute: SiteIndexRoute,
+  SiteProdukSlugRoute: SiteProdukSlugRoute,
+  SiteProdukIndexRoute: SiteProdukIndexRoute,
 }
 
 const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)

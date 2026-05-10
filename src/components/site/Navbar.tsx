@@ -64,8 +64,17 @@ export function Navbar() {
               key={l.to}
               to={l.to}
               className={cn(
-                "text-[15px] transition-colors hover:text-primary",
-                path === l.to ? "text-primary font-bold" : "text-foreground font-medium",
+                "text-[15px] transition-colors",
+                isSolid
+                  ? "hover:text-primary"
+                  : "hover:text-white",
+                path === l.to
+                  ? isSolid
+                    ? "text-primary font-bold"
+                    : "text-white font-bold"
+                  : isSolid
+                    ? "text-foreground font-medium"
+                    : "text-white/80 font-medium"
               )}
             >
               {l.label}
@@ -77,7 +86,11 @@ export function Navbar() {
           <div
             className={cn(
               "hidden md:flex items-center overflow-hidden rounded-full transition-all duration-300",
-              searchOpen ? "w-48 bg-muted shadow-inner ring-1 ring-border" : "w-9"
+              searchOpen 
+                ? isSolid 
+                  ? "w-48 bg-muted shadow-inner ring-1 ring-border" 
+                  : "w-48 bg-white/10 backdrop-blur shadow-inner ring-1 ring-white/20"
+                : "w-9"
             )}
           >
             <button
@@ -94,7 +107,12 @@ export function Navbar() {
                   setSearchOpen(true);
                 }
               }}
-              className="group flex h-9 min-w-9 items-center justify-center rounded-full text-foreground/70 transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:shadow-sm z-10"
+              className={cn(
+                "group flex h-9 min-w-9 items-center justify-center rounded-full transition-all duration-300 hover:shadow-sm z-10",
+                isSolid
+                  ? "text-foreground/70 hover:bg-primary/10 hover:text-primary"
+                  : "text-white/80 hover:bg-white/20 hover:text-white"
+              )}
               aria-label="Cari produk"
             >
               <Search className="h-4 w-4 transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12" />
@@ -112,13 +130,19 @@ export function Navbar() {
               placeholder="Cari..."
               className={cn(
                 "h-9 bg-transparent text-sm outline-none transition-all duration-300",
+                isSolid ? "text-foreground placeholder-muted-foreground" : "text-white placeholder-white/50",
                 searchOpen ? "w-full px-2 opacity-100" : "w-0 px-0 opacity-0"
               )}
             />
           </div>
           <Link
             to="/keranjang"
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground/80 transition hover:bg-primary hover:text-primary-foreground"
+            className={cn(
+              "relative inline-flex h-9 w-9 items-center justify-center rounded-full transition",
+              isSolid
+                ? "bg-muted text-foreground/80 hover:bg-primary hover:text-primary-foreground"
+                : "bg-white/10 text-white hover:bg-white hover:text-black"
+            )}
             aria-label="Keranjang"
           >
             <ShoppingCart className="h-4 w-4" />
@@ -130,7 +154,12 @@ export function Navbar() {
           </Link>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/70 hover:bg-muted md:hidden"
+            className={cn(
+              "inline-flex h-9 w-9 items-center justify-center rounded-full md:hidden",
+              isSolid
+                ? "text-foreground/70 hover:bg-muted"
+                : "text-white/80 hover:bg-white/10 hover:text-white"
+            )}
             aria-label="Menu"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

@@ -12,7 +12,7 @@ const search = z.object({
   kategori: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_site/produk")({
+export const Route = createFileRoute("/_site/produk/")({
   validateSearch: search,
   head: () => ({
     meta: [
