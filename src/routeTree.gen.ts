@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as SiteTentangRouteImport } from './routes/_site.tentang'
@@ -19,6 +21,16 @@ import { Route as SiteArtikelRouteImport } from './routes/_site.artikel'
 import { Route as SiteProdukSlugRouteImport } from './routes/_site.produk.$slug'
 import { Route as SiteArtikelSlugRouteImport } from './routes/_site.artikel.$slug'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SiteRoute = SiteRouteImport.update({
   id: '/_site',
   getParentRoute: () => rootRouteImport,
@@ -66,6 +78,8 @@ const SiteArtikelSlugRoute = SiteArtikelSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
+  '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
   '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
@@ -75,6 +89,8 @@ export interface FileRoutesByFullPath {
   '/produk/$slug': typeof SiteProdukSlugRoute
 }
 export interface FileRoutesByTo {
+  '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
   '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
@@ -87,6 +103,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_site': typeof SiteRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
   '/_site/artikel': typeof SiteArtikelRouteWithChildren
   '/_site/keranjang': typeof SiteKeranjangRoute
   '/_site/kontak': typeof SiteKontakRoute
@@ -100,6 +118,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
+    | '/login'
     | '/artikel'
     | '/keranjang'
     | '/kontak'
@@ -109,6 +129,8 @@ export interface FileRouteTypes {
     | '/produk/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/admin'
+    | '/login'
     | '/artikel'
     | '/keranjang'
     | '/kontak'
@@ -120,6 +142,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_site'
+    | '/admin'
+    | '/login'
     | '/_site/artikel'
     | '/_site/keranjang'
     | '/_site/kontak'
@@ -132,10 +156,26 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   SiteRoute: typeof SiteRouteWithChildren
+  AdminRoute: typeof AdminRoute
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_site': {
       id: '/_site'
       path: ''
@@ -248,6 +288,8 @@ const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   SiteRoute: SiteRouteWithChildren,
+  AdminRoute: AdminRoute,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
