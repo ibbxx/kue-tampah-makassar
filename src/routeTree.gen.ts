@@ -19,7 +19,7 @@ import { Route as AdminProdukRouteImport } from './routes/admin.produk'
 import { Route as AdminPesanRouteImport } from './routes/admin.pesan'
 import { Route as AdminPanduanRouteImport } from './routes/admin.panduan'
 import { Route as AdminOrderRouteImport } from './routes/admin.order'
-import { Route as AdminKategoriRouteImport } from './routes/admin.kategori'
+import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminArtikelRouteImport } from './routes/admin.artikel'
 import { Route as SiteTentangRouteImport } from './routes/_site.tentang'
 import { Route as SiteProdukRouteImport } from './routes/_site.produk'
@@ -78,9 +78,9 @@ const AdminOrderRoute = AdminOrderRouteImport.update({
   path: '/order',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminKategoriRoute = AdminKategoriRouteImport.update({
-  id: '/kategori',
-  path: '/kategori',
+const AdminHeroRoute = AdminHeroRouteImport.update({
+  id: '/hero',
+  path: '/hero',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminArtikelRoute = AdminArtikelRouteImport.update({
@@ -134,7 +134,7 @@ export interface FileRoutesByFullPath {
   '/produk': typeof SiteProdukRouteWithChildren
   '/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
-  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/hero': typeof AdminHeroRoute
   '/admin/order': typeof AdminOrderRoute
   '/admin/panduan': typeof AdminPanduanRoute
   '/admin/pesan': typeof AdminPesanRoute
@@ -152,7 +152,7 @@ export interface FileRoutesByTo {
   '/produk': typeof SiteProdukRouteWithChildren
   '/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
-  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/hero': typeof AdminHeroRoute
   '/admin/order': typeof AdminOrderRoute
   '/admin/panduan': typeof AdminPanduanRoute
   '/admin/pesan': typeof AdminPesanRoute
@@ -174,7 +174,7 @@ export interface FileRoutesById {
   '/_site/produk': typeof SiteProdukRouteWithChildren
   '/_site/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
-  '/admin/kategori': typeof AdminKategoriRoute
+  '/admin/hero': typeof AdminHeroRoute
   '/admin/order': typeof AdminOrderRoute
   '/admin/panduan': typeof AdminPanduanRoute
   '/admin/pesan': typeof AdminPesanRoute
@@ -197,7 +197,7 @@ export interface FileRouteTypes {
     | '/produk'
     | '/tentang'
     | '/admin/artikel'
-    | '/admin/kategori'
+    | '/admin/hero'
     | '/admin/order'
     | '/admin/panduan'
     | '/admin/pesan'
@@ -215,7 +215,7 @@ export interface FileRouteTypes {
     | '/produk'
     | '/tentang'
     | '/admin/artikel'
-    | '/admin/kategori'
+    | '/admin/hero'
     | '/admin/order'
     | '/admin/panduan'
     | '/admin/pesan'
@@ -236,7 +236,7 @@ export interface FileRouteTypes {
     | '/_site/produk'
     | '/_site/tentang'
     | '/admin/artikel'
-    | '/admin/kategori'
+    | '/admin/hero'
     | '/admin/order'
     | '/admin/panduan'
     | '/admin/pesan'
@@ -326,11 +326,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrderRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/kategori': {
-      id: '/admin/kategori'
-      path: '/kategori'
-      fullPath: '/admin/kategori'
-      preLoaderRoute: typeof AdminKategoriRouteImport
+    '/admin/hero': {
+      id: '/admin/hero'
+      path: '/hero'
+      fullPath: '/admin/hero'
+      preLoaderRoute: typeof AdminHeroRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/artikel': {
@@ -438,7 +438,7 @@ const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
 
 interface AdminRouteChildren {
   AdminArtikelRoute: typeof AdminArtikelRoute
-  AdminKategoriRoute: typeof AdminKategoriRoute
+  AdminHeroRoute: typeof AdminHeroRoute
   AdminOrderRoute: typeof AdminOrderRoute
   AdminPanduanRoute: typeof AdminPanduanRoute
   AdminPesanRoute: typeof AdminPesanRoute
@@ -449,7 +449,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminArtikelRoute: AdminArtikelRoute,
-  AdminKategoriRoute: AdminKategoriRoute,
+  AdminHeroRoute: AdminHeroRoute,
   AdminOrderRoute: AdminOrderRoute,
   AdminPanduanRoute: AdminPanduanRoute,
   AdminPesanRoute: AdminPesanRoute,
@@ -468,3 +468,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

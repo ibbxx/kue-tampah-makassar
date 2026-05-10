@@ -20,5 +20,5 @@ VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOi...   (anon / publishable key)
    ```
 3. Login di `/login`.
 
-## 4. Upload gambar produk
-Bucket `product-images` sudah dibuat (public read, admin write). Pakai admin dashboard untuk upload.
+## 4. Upload gambar
+Bucket `product-images` dipakai untuk produk. Bucket `site-images` dipakai untuk hero beranda dan konten website lain. Keduanya public read dan admin write.

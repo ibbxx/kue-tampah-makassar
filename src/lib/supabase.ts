@@ -34,6 +34,7 @@ export type Category = {
   name: string;
   slug: string;
   description: string | null;
+  image_url?: string | null;
 };
 
 export type Article = {
@@ -45,6 +46,22 @@ export type Article = {
   cover_url: string | null;
   published: boolean;
   created_at: string;
+};
+
+export type HomepageHero = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  highlight_text: string;
+  description: string;
+  primary_button_label: string;
+  primary_button_url: string;
+  secondary_button_label: string;
+  secondary_button_url: string;
+  image_url: string | null;
+  image_alt: string;
+  is_active: boolean;
+  updated_at: string;
 };
 
 export type Order = {

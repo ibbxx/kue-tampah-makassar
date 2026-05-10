@@ -12,12 +12,18 @@ export function useAuth() {
 
     const checkRole = async (uid: string | undefined) => {
       if (!uid) return false;
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", uid)
         .eq("role", "admin")
         .maybeSingle();
+      
+      if (error) {
+        console.error("[useAuth] Error checking role:", error);
+      }
+      console.log("[useAuth] Role check result for", uid, ":", data);
+      
       return !!data;
     };
 
@@ -47,5 +53,12 @@ export function useAuth() {
     };
   }, []);
 
-  return { user, isAdmin, loading, signOut: () => supabase.auth.signOut() };
+  return { 
+    user, 
+    isAdmin, // <-- Diperbaiki: Sekarang menggunakan state asli dari pengecekan database, bukan di-hardcode lagi
+    loading, 
+    signOut: () => {
+      return supabase.auth.signOut();
+    }
+  };
 }

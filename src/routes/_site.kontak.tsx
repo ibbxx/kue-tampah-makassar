@@ -4,13 +4,14 @@ import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
 
 export const Route = createFileRoute("/_site/kontak")({
   head: () => ({
     meta: [
-      { title: "Kontak — Kue Tampah Ratulangi" },
-      { name: "description", content: "Hubungi Kue Tampah Ratulangi di Jl. DR. Ratulangi, Mariso, Makassar. WhatsApp 0823-1111-3823." },
-      { property: "og:title", content: "Kontak Kue Tampah Ratulangi" },
+      { title: `Kontak — ${SITE_CONFIG.name}` },
+      { name: "description", content: `Hubungi ${SITE_CONFIG.name} di ${SITE_CONFIG.addressShort}. WhatsApp ${SITE_CONFIG.phone}.` },
+      { property: "og:title", content: `Kontak ${SITE_CONFIG.name}` },
       { property: "og:description", content: "Pesan & informasi outlet di Makassar." },
     ],
   }),
@@ -52,7 +53,7 @@ function ContactPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-32 pb-12 md:px-8">
       <div className="text-center">
         <h1 className="font-display text-4xl font-bold text-primary">Hubungi Kami</h1>
         <p className="mt-2 text-muted-foreground">Kami siap membantu kebutuhan kue tampah terbaik untuk Anda.</p>
@@ -60,16 +61,16 @@ function ContactPage() {
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">
         <div className="space-y-4">
-          <ContactCard icon={Phone} title="WhatsApp" text="0823-1111-3823" href="https://wa.me/6282311113823" />
-          <ContactCard icon={Instagram} title="Instagram" text="@kuetampah.id" href="https://instagram.com/kuetampah.id" />
-          <ContactCard icon={MapPin} title="Alamat" text="Jl. DR. Ratulangi, Mariso, Makassar, Sulawesi Selatan 90125" />
-          <ContactCard icon={Clock} title="Jam Buka" text="Senin – Minggu, 06.00 – 20.00 WITA" />
-          <ContactCard icon={Mail} title="Email" text="halo@kuetampah.id" href="mailto:halo@kuetampah.id" />
+          <ContactCard icon={Phone} title="WhatsApp" text={SITE_CONFIG.phone} href={SOCIAL_LINKS.whatsapp} />
+          <ContactCard icon={Instagram} title="Instagram" text={SITE_CONFIG.instagram} href={SOCIAL_LINKS.instagram} />
+          <ContactCard icon={MapPin} title="Alamat" text={SITE_CONFIG.address} />
+          <ContactCard icon={Clock} title="Jam Buka" text={SITE_CONFIG.openingHours} />
+          <ContactCard icon={Mail} title="Email" text={SITE_CONFIG.email} href={`mailto:${SITE_CONFIG.email}`} />
 
           <div className="overflow-hidden rounded-2xl border border-border">
             <iframe
-              title="Lokasi Kue Tampah Ratulangi"
-              src="https://www.google.com/maps?q=Jl.+DR.+Ratulangi,+Mariso,+Makassar&output=embed"
+              title={`Lokasi ${SITE_CONFIG.name}`}
+              src={SITE_CONFIG.mapEmbedUrl}
               className="h-72 w-full"
               loading="lazy"
             />
@@ -91,7 +92,7 @@ function ContactPage() {
             <Send className="h-4 w-4" /> {submitting ? "Mengirim..." : "Kirim Pesan"}
           </button>
           <a
-            href="https://wa.me/6282311113823"
+            href={SOCIAL_LINKS.whatsapp}
             target="_blank"
             rel="noopener"
             className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent py-3 font-semibold text-accent hover:bg-accent hover:text-accent-foreground"

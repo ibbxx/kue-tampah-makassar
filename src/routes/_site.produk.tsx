@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { supabase, type Product, type Category } from "@/lib/supabase";
 import { ProductCard } from "@/components/site/ProductCard";
+import { SITE_CONFIG } from "@/lib/constants";
 
 const search = z.object({
   q: z.string().optional(),
@@ -15,8 +16,8 @@ export const Route = createFileRoute("/_site/produk")({
   validateSearch: search,
   head: () => ({
     meta: [
-      { title: "Produk — Kue Tampah Ratulangi" },
-      { name: "description", content: "Katalog kue tampah, jajanan pasar, dan paket suguhan acara." },
+      { title: `Produk — ${SITE_CONFIG.name}` },
+      { name: "description", content: `Katalog lengkap kue tampah, jajanan pasar, dan suguhan acara khas ${SITE_CONFIG.city}.` },
       { property: "og:title", content: "Produk Kue Tampah" },
       { property: "og:description", content: "Pilih kue tampah favorit Anda." },
     ],
@@ -50,15 +51,15 @@ function ProductsPage() {
       const cat = (categories ?? []).find((c) => c.slug === kategori);
       if (cat) list = list.filter((p) => p.category_id === cat.id);
     }
-    if (q) {
-      const t = q.toLowerCase();
+    if (query) {
+      const t = query.toLowerCase();
       list = list.filter((p) => p.name.toLowerCase().includes(t) || (p.description ?? "").toLowerCase().includes(t));
     }
     return list;
-  }, [products, categories, q, kategori]);
+  }, [products, categories, query, kategori]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-32 pb-12 md:px-8">
       <div className="text-center">
         <h1 className="font-display text-4xl font-bold text-primary">Produk Kami</h1>
         <p className="mt-2 text-muted-foreground">Temukan aneka kue tampah terbaik untuk setiap momen spesial Anda.</p>
@@ -68,28 +69,32 @@ function ProductsPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, q: query || undefined }) });
+            navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, q: query || undefined }), replace: true });
           }}
-          className="relative w-full md:max-w-md"
+          className="group relative w-full md:max-w-md"
         >
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-all duration-300 group-focus-within:scale-110 group-focus-within:text-primary" />
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setQuery(val);
+              navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, q: val || undefined }), replace: true });
+            }}
             placeholder="Cari kue tampah..."
-            className="h-11 w-full rounded-full border border-border bg-background pl-10 pr-4 text-sm outline-none focus:border-primary"
+            className="peer h-11 w-full rounded-full border border-border bg-background pl-10 pr-4 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_15px_rgba(var(--primary),0.2)] focus:ring-2 focus:ring-primary/20"
           />
         </form>
 
         <div className="flex flex-wrap gap-2">
-          <FilterPill active={!kategori} onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: undefined }) })}>
+          <FilterPill active={!kategori} onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: undefined }), replace: true })}>
             Semua
           </FilterPill>
           {(categories ?? []).map((c) => (
             <FilterPill
               key={c.id}
               active={kategori === c.slug}
-              onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: c.slug }) })}
+              onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: c.slug }), replace: true })}
             >
               {c.name}
             </FilterPill>
@@ -120,12 +125,18 @@ function ProductsPage() {
 function FilterPill({ children, active, onClick }: { children: React.ReactNode; active?: boolean; onClick: () => void }) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground/80 hover:border-primary/40"
+      className={`relative overflow-hidden rounded-full border px-5 py-2 text-sm font-medium transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:scale-95 ${
+        active
+          ? "border-primary bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/30 ring-offset-1 ring-offset-background"
+          : "border-border bg-background text-foreground/70 hover:border-primary/50 hover:text-foreground"
       }`}
     >
-      {children}
+      <span className="relative z-10 pointer-events-none">{children}</span>
+      {active && (
+        <span className="absolute inset-0 -z-10 animate-[pulse_2s_ease-in-out_infinite] bg-white/10 blur-sm pointer-events-none" />
+      )}
     </button>
   );
 }

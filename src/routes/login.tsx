@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Login Admin — Kue Tampah" }] }),
@@ -35,9 +36,8 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary via-background to-secondary/30 px-4">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-xl">
         <Link to="/" className="block text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary font-display text-xl font-bold text-primary-foreground">K</div>
-          <div className="mt-2 font-display text-xl font-bold text-primary">Kue Tampah</div>
-          <div className="text-xs text-muted-foreground">Admin Dashboard</div>
+          <img src={SITE_CONFIG.logo} alt={SITE_CONFIG.name} className="mx-auto h-24 w-auto object-contain" />
+          <div className="mt-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">Admin Dashboard</div>
         </Link>
         <form onSubmit={submit} className="mt-8 space-y-4">
           <label className="block">

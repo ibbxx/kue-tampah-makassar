@@ -2,13 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, ImageOff } from "lucide-react";
 import { supabase, type Article } from "@/lib/supabase";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const Route = createFileRoute("/_site/artikel")({
   head: () => ({
     meta: [
-      { title: "Artikel — Kue Tampah Ratulangi" },
-      { name: "description", content: "Tips, cerita, dan informasi seputar kue tradisional Makassar." },
-      { property: "og:title", content: "Artikel Kue Tampah" },
+      { title: `Artikel — ${SITE_CONFIG.name}` },
+      { name: "description", content: `Tips, cerita, dan informasi seputar kue tradisional ${SITE_CONFIG.city}.` },
+      { property: "og:title", content: `Artikel ${SITE_CONFIG.name}` },
       { property: "og:description", content: "Edukasi seputar kue tradisional & paket acara." },
     ],
   }),
@@ -29,7 +30,7 @@ function ArticlesPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-32 pb-12 md:px-8">
       <div className="text-center">
         <h1 className="font-display text-4xl font-bold text-primary">Artikel & Cerita</h1>
         <p className="mt-2 text-muted-foreground">Inspirasi kue tradisional & tips suguhan acara</p>

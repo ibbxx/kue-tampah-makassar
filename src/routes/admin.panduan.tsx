@@ -20,7 +20,15 @@ const sections = [
     ],
   },
   {
-    title: "3. Mengelola Produk",
+    title: "3. Mengelola Hero Beranda",
+    body: [
+      "Buka menu 'Atur Hero' untuk mengubah teks kecil, judul, deskripsi, tombol, dan gambar utama beranda.",
+      "Upload gambar langsung dari form hero; file akan disimpan ke bucket 'site-images'.",
+      "Jika hero custom dimatikan, beranda tetap memakai konten fallback bawaan.",
+    ],
+  },
+  {
+    title: "4. Mengelola Produk",
     body: [
       "Buka menu 'Atur Produk' → klik Tambah untuk membuat produk baru.",
       "Isi nama, harga, stok, kategori, badge (Best Seller / Baru), dan URL gambar.",
@@ -28,28 +36,28 @@ const sections = [
     ],
   },
   {
-    title: "4. Mengelola Stok",
+    title: "5. Mengelola Stok",
     body: [
       "Menu 'Atur Stok' menampilkan semua produk dengan input stok yang bisa diubah cepat.",
       "Setelah mengubah angka, klik tombol Simpan di baris yang sama untuk update.",
     ],
   },
   {
-    title: "5. Mengelola Kategori",
+    title: "6. Mengelola Kategori",
     body: [
       "Buat kategori (misal: Tampah Premium, Tampah Mini) untuk memudahkan filter pelanggan.",
       "Slug otomatis terbuat dari nama; bisa diedit manual.",
     ],
   },
   {
-    title: "6. Mengelola Artikel",
+    title: "7. Mengelola Artikel",
     body: [
       "Tulis artikel di menu 'Atur Artikel'. Centang 'Publikasikan' agar tampil di /artikel.",
       "Konten mendukung paragraf biasa; gunakan baris kosong untuk pemisah paragraf.",
     ],
   },
   {
-    title: "7. Order Masuk",
+    title: "8. Order Masuk",
     body: [
       "Setiap checkout dari pelanggan akan tersimpan di sini dengan status 'pending'.",
       "Update status pesanan: pending → diproses → selesai (atau batal).",
@@ -57,16 +65,17 @@ const sections = [
     ],
   },
   {
-    title: "8. Pesan Kontak",
+    title: "9. Pesan Kontak",
     body: [
       "Inbox dari form kontak. Tandai sudah dibaca atau hapus jika tidak relevan.",
     ],
   },
   {
-    title: "9. Upload gambar produk",
+    title: "10. Upload gambar",
     body: [
       "Bucket 'product-images' sudah dibuat (public read, admin write).",
-      "Upload manual via Supabase Dashboard → Storage → product-images, lalu salin URL public ke kolom 'URL Gambar' produk.",
+      "Bucket 'site-images' dipakai untuk gambar hero dan konten website lain.",
+      "Upload produk dan hero bisa dilakukan langsung dari dashboard admin.",
     ],
   },
 ];

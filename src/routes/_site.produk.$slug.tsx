@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_site/produk/$slug")({
   component: ProductDetail,
   notFoundComponent: () => (
-    <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+    <div className="mx-auto max-w-3xl px-4 pt-32 pb-20 text-center">
       <h1 className="font-display text-3xl">Produk tidak ditemukan</h1>
       <Link to="/produk" className="mt-4 inline-block text-primary hover:underline">← Kembali ke katalog</Link>
     </div>
@@ -31,11 +31,11 @@ function ProductDetail() {
   });
 
   if (isLoading) {
-    return <div className="mx-auto max-w-7xl px-4 py-20 text-center text-muted-foreground">Memuat...</div>;
+    return <div className="mx-auto max-w-7xl px-4 pt-32 pb-20 text-center text-muted-foreground">Memuat...</div>;
   }
   if (!product) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+      <div className="mx-auto max-w-3xl px-4 pt-32 pb-20 text-center">
         <h1 className="font-display text-3xl">Produk tidak ditemukan</h1>
         <Link to="/produk" className="mt-4 inline-block text-primary hover:underline">← Kembali ke katalog</Link>
       </div>
@@ -53,7 +53,7 @@ function ProductDetail() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-32 pb-10 md:px-8">
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
         <Link to="/" className="hover:text-primary">Beranda</Link>
         <ChevronRight className="h-3 w-3" />

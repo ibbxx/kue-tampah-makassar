@@ -17,10 +17,10 @@ function ArticleDetail() {
     },
   });
 
-  if (isLoading) return <div className="py-20 text-center text-muted-foreground">Memuat...</div>;
+  if (isLoading) return <div className="pt-32 pb-20 text-center text-muted-foreground">Memuat...</div>;
   if (!article) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+      <div className="mx-auto max-w-3xl px-4 pt-32 pb-20 text-center">
         <h1 className="font-display text-3xl">Artikel tidak ditemukan</h1>
         <Link to="/artikel" className="mt-4 inline-block text-primary hover:underline">← Kembali</Link>
       </div>
@@ -28,7 +28,7 @@ function ArticleDetail() {
   }
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 md:px-8">
+    <article className="mx-auto max-w-3xl px-4 pt-32 pb-12 md:px-8">
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
         <Link to="/" className="hover:text-primary">Beranda</Link>
         <ChevronRight className="h-3 w-3" />

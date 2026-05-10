@@ -1,43 +1,71 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { ShoppingCart, Menu, X, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
+import { SITE_CONFIG } from "@/lib/constants";
 
 const links = [
   { to: "/", label: "Beranda" },
   { to: "/produk", label: "Produk" },
-  { to: "/tentang", label: "Tentang" },
-  { to: "/artikel", label: "Artikel" },
+  { to: "/tentang", label: "Tentang Kami" },
+  { to: "/artikel", label: "Blog" },
   { to: "/kontak", label: "Kontak" },
 ] as const;
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const count = useCart((s) => s.count());
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isSolid = scrolled || hovered || open || searchOpen;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-display text-lg font-bold">
-            K
-          </div>
-          <div className="leading-tight">
-            <div className="font-display text-lg font-bold text-primary">Kue Tampah</div>
-            <div className="-mt-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">Ratulangi</div>
+    <header 
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={cn(
+        "fixed top-0 z-40 w-full transition-all duration-500",
+        isSolid 
+          ? "border-b border-border/40 bg-background/95 backdrop-blur shadow-sm supports-[backdrop-filter]:bg-background/60" 
+          : "border-b-transparent bg-transparent"
+      )}
+    >
+      <div className="flex h-16 items-center justify-between px-4 md:px-8">
+        <Link to="/" className="flex items-center">
+          <img
+            src={SITE_CONFIG.logo}
+            alt={SITE_CONFIG.name}
+            className="h-16 object-contain md:h-24"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement?.querySelector('.logo-fallback')?.classList.remove('hidden');
+            }}
+          />
+          <div className="logo-fallback hidden flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-display text-lg font-bold">
+            {SITE_CONFIG.shortName.charAt(0)}
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-8 md:flex">
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                path === l.to ? "text-primary" : "text-foreground/80",
+                "text-[15px] transition-colors hover:text-primary",
+                path === l.to ? "text-primary font-bold" : "text-foreground font-medium",
               )}
             >
               {l.label}
@@ -46,13 +74,48 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            to="/produk"
-            className="hidden h-9 w-9 items-center justify-center rounded-full text-foreground/70 transition hover:bg-muted hover:text-primary md:inline-flex"
-            aria-label="Cari produk"
+          <div
+            className={cn(
+              "hidden md:flex items-center overflow-hidden rounded-full transition-all duration-300",
+              searchOpen ? "w-48 bg-muted shadow-inner ring-1 ring-border" : "w-9"
+            )}
           >
-            <Search className="h-4 w-4" />
-          </Link>
+            <button
+              onClick={() => {
+                if (searchOpen) {
+                  if (searchQuery.trim()) {
+                    navigate({ to: "/produk", search: { q: searchQuery } });
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                  } else {
+                    setSearchOpen(false);
+                  }
+                } else {
+                  setSearchOpen(true);
+                }
+              }}
+              className="group flex h-9 min-w-9 items-center justify-center rounded-full text-foreground/70 transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:shadow-sm z-10"
+              aria-label="Cari produk"
+            >
+              <Search className="h-4 w-4 transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12" />
+            </button>
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchQuery.trim()) {
+                  navigate({ to: "/produk", search: { q: searchQuery } });
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }
+              }}
+              placeholder="Cari..."
+              className={cn(
+                "h-9 bg-transparent text-sm outline-none transition-all duration-300",
+                searchOpen ? "w-full px-2 opacity-100" : "w-0 px-0 opacity-0"
+              )}
+            />
+          </div>
           <Link
             to="/keranjang"
             className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground/80 transition hover:bg-primary hover:text-primary-foreground"

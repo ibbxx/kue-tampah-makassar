@@ -17,6 +17,7 @@ create table if not exists public.categories (
   name text not null,
   slug text not null unique,
   description text,
+  image_url text,
   created_at timestamptz default now()
 );
 
@@ -77,6 +78,23 @@ create table if not exists public.contact_messages (
   created_at timestamptz default now()
 );
 
+create table if not exists public.homepage_hero (
+  id text primary key default 'home',
+  eyebrow text not null default 'Kue Tradisional, Rasa Istimewa',
+  title text not null default 'Kue Tampah Khas',
+  highlight_text text not null default 'Makassar',
+  description text not null default 'Aneka kue tradisional dibuat dengan bahan berkualitas dan cinta — siap memeriahkan momen spesial keluarga Anda.',
+  primary_button_label text not null default 'Belanja Sekarang',
+  primary_button_url text not null default '/produk',
+  secondary_button_label text not null default 'Lihat Produk',
+  secondary_button_url text not null default '/produk',
+  image_url text,
+  image_alt text not null default 'Aneka kue tampah khas Makassar',
+  is_active boolean default true,
+  updated_at timestamptz default now(),
+  constraint homepage_hero_singleton check (id = 'home')
+);
+
 create table if not exists public.user_roles (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade not null,
@@ -110,6 +128,7 @@ alter table public.articles enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 alter table public.contact_messages enable row level security;
+alter table public.homepage_hero enable row level security;
 alter table public.user_roles enable row level security;
 
 -- categories: public read, admin write
@@ -160,6 +179,14 @@ create policy "contact_admin_all" on public.contact_messages for all
   using (public.has_role(auth.uid(), 'admin'))
   with check (public.has_role(auth.uid(), 'admin'));
 
+-- homepage_hero: public read, admin write
+drop policy if exists "homepage_hero_select_active" on public.homepage_hero;
+create policy "homepage_hero_select_active" on public.homepage_hero for select using (is_active or public.has_role(auth.uid(), 'admin'));
+drop policy if exists "homepage_hero_admin_all" on public.homepage_hero;
+create policy "homepage_hero_admin_all" on public.homepage_hero for all
+  using (public.has_role(auth.uid(), 'admin'))
+  with check (public.has_role(auth.uid(), 'admin'));
+
 -- user_roles: only admins can manage; users can read their own
 drop policy if exists "user_roles_self_read" on public.user_roles;
 create policy "user_roles_self_read" on public.user_roles for select using (auth.uid() = user_id or public.has_role(auth.uid(), 'admin'));
@@ -191,6 +218,27 @@ drop policy if exists "product_images_admin_delete" on storage.objects;
 create policy "product_images_admin_delete" on storage.objects
   for delete using (bucket_id = 'product-images' and public.has_role(auth.uid(), 'admin'));
 
+-- Bucket untuk gambar konten website seperti hero homepage
+insert into storage.buckets (id, name, public)
+values ('site-images', 'site-images', true)
+on conflict (id) do nothing;
+
+drop policy if exists "site_images_public_read" on storage.objects;
+create policy "site_images_public_read" on storage.objects
+  for select using (bucket_id = 'site-images');
+
+drop policy if exists "site_images_admin_write" on storage.objects;
+create policy "site_images_admin_write" on storage.objects
+  for insert with check (bucket_id = 'site-images' and public.has_role(auth.uid(), 'admin'));
+
+drop policy if exists "site_images_admin_update" on storage.objects;
+create policy "site_images_admin_update" on storage.objects
+  for update using (bucket_id = 'site-images' and public.has_role(auth.uid(), 'admin'));
+
+drop policy if exists "site_images_admin_delete" on storage.objects;
+create policy "site_images_admin_delete" on storage.objects
+  for delete using (bucket_id = 'site-images' and public.has_role(auth.uid(), 'admin'));
+
 -- =====================================================================
 -- 6. SEED kategori awal
 -- =====================================================================
@@ -200,6 +248,33 @@ insert into public.categories (name, slug, description) values
   ('Tampah Spesial', 'tampah-spesial', 'Isi lengkap, rasa istimewa'),
   ('Tampah Keluarga', 'tampah-keluarga', 'Porsi pas untuk keluarga')
 on conflict (slug) do nothing;
+
+insert into public.homepage_hero (
+  id,
+  eyebrow,
+  title,
+  highlight_text,
+  description,
+  primary_button_label,
+  primary_button_url,
+  secondary_button_label,
+  secondary_button_url,
+  image_alt,
+  is_active
+) values (
+  'home',
+  'Kue Tradisional, Rasa Istimewa',
+  'Kue Tampah Khas',
+  'Makassar',
+  'Aneka kue tradisional dibuat dengan bahan berkualitas dan cinta — siap memeriahkan momen spesial keluarga Anda.',
+  'Belanja Sekarang',
+  '/produk',
+  'Lihat Produk',
+  '/produk',
+  'Aneka kue tampah khas Makassar',
+  true
+)
+on conflict (id) do nothing;
 
 -- =====================================================================
 -- 7. CARA MEMBUAT USER ADMIN

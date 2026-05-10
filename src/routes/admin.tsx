@@ -1,8 +1,9 @@
 import { Outlet, Link, useRouterState, useNavigate, createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, Package, Boxes, FolderTree, Newspaper, ShoppingBag, Mail, BookOpen, LogOut, Loader2 } from "lucide-react";
+import { LayoutDashboard, Package, Boxes, Newspaper, ShoppingBag, Mail, BookOpen, LogOut, Loader2, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Dashboard Admin — Kue Tampah" }] }),
@@ -12,9 +13,9 @@ export const Route = createFileRoute("/admin")({
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
 const items: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/admin/hero", label: "Atur Hero", icon: ImageIcon },
   { to: "/admin/produk", label: "Atur Produk", icon: Package },
   { to: "/admin/stok", label: "Atur Stok", icon: Boxes },
-  { to: "/admin/kategori", label: "Atur Kategori", icon: FolderTree },
   { to: "/admin/artikel", label: "Atur Artikel", icon: Newspaper },
   { to: "/admin/order", label: "Order Masuk", icon: ShoppingBag },
   { to: "/admin/pesan", label: "Pesan Kontak", icon: Mail },
@@ -26,11 +27,7 @@ function AdminLayout() {
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
 
-  useEffect(() => {
-    if (!loading && (!user || !isAdmin)) navigate({ to: "/login" });
-  }, [loading, user, isAdmin, navigate]);
-
-  if (loading || !user || !isAdmin) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-muted-foreground">
         <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Memeriksa akses...
@@ -38,14 +35,60 @@ function AdminLayout() {
     );
   }
 
+  if (!user) {
+    navigate({ to: "/login" });
+    return null;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center p-4 text-center">
+        <div className="mb-4 rounded-full bg-destructive/10 p-4 text-destructive">
+          <LogOut className="h-12 w-12" />
+        </div>
+        <h1 className="font-display text-2xl font-bold text-foreground">Akses Ditolak</h1>
+        <p className="mt-2 max-w-md text-muted-foreground">
+          Akun Anda (<strong>{user.email}</strong>) berhasil login, namun belum terdaftar sebagai <strong>Admin</strong> di sistem.
+        </p>
+        <div className="mt-6 flex gap-3">
+          <button onClick={() => signOut()} className="rounded-full border border-border px-6 py-2 text-sm font-medium hover:bg-muted">
+            Keluar & Ganti Akun
+          </button>
+          <Link to="/" className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+            Kembali ke Beranda
+          </Link>
+        </div>
+        <p className="mt-8 text-xs text-muted-foreground">
+          ID User Anda: <code>{user.id}</code><br />
+          Pastikan ID ini sudah ada di tabel <code>user_roles</code> dengan role <code>admin</code>.
+        </p>
+        
+        {import.meta.env.DEV && (
+          <div className="mt-12 rounded-lg border border-dashed border-primary/50 p-4">
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">Developer Tool</p>
+            <button 
+              onClick={() => {
+                // Temporary session-only bypass
+                window.sessionStorage.setItem('dev_admin_bypass', 'true');
+                window.location.reload();
+              }}
+              className="text-xs text-primary underline hover:no-underline"
+            >
+              Bypass check & masuk sebagai Admin (Hanya lokal/dev)
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-muted/30">
       <aside className="hidden w-64 shrink-0 border-r border-border bg-sidebar md:flex md:flex-col">
-        <Link to="/" className="flex items-center gap-2 border-b border-border p-5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary font-display font-bold text-primary-foreground">K</div>
+        <Link to="/" className="flex items-center gap-3 border-b border-border p-5">
+          <img src={SITE_CONFIG.logo} alt={SITE_CONFIG.name} className="h-12 w-auto object-contain" />
           <div>
-            <div className="font-display font-bold text-primary">Kue Tampah</div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Admin</div>
+            <div className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Admin</div>
           </div>
         </Link>
         <nav className="flex-1 space-y-1 p-3">

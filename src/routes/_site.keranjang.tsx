@@ -5,11 +5,12 @@ import { z } from "zod";
 import { useCart } from "@/lib/cart";
 import { formatRupiah, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
 
 export const Route = createFileRoute("/_site/keranjang")({
   head: () => ({
     meta: [
-      { title: "Keranjang Belanja — Kue Tampah Ratulangi" },
+      { title: `Keranjang Belanja — ${SITE_CONFIG.name}` },
       { name: "description", content: "Lihat keranjang belanja dan checkout pesanan Anda." },
     ],
   }),
@@ -70,7 +71,7 @@ function CartPage() {
 
       const lines = items.map((i) => `• ${i.name} x${i.qty} — ${formatRupiah(i.price * i.qty)}`).join("%0A");
       const msg =
-        `Halo Kue Tampah! Saya ingin pesan:%0A%0A${lines}%0A%0A` +
+        `Halo ${SITE_CONFIG.shortName}! Saya ingin pesan:%0A%0A${lines}%0A%0A` +
         `Subtotal: ${formatRupiah(subtotal)}%0AOngkir: ${formatRupiah(ONGKIR)}%0A*Total: ${formatRupiah(total)}*%0A%0A` +
         `Nama: ${parsed.data.name}%0AHP: ${parsed.data.phone}` +
         (parsed.data.address ? `%0AAlamat: ${parsed.data.address}` : "") +
@@ -79,7 +80,7 @@ function CartPage() {
 
       clear();
       toast.success("Pesanan tersimpan! Membuka WhatsApp...");
-      window.open(`https://wa.me/6282311113823?text=${msg}`, "_blank");
+      window.open(`${SOCIAL_LINKS.whatsapp}?text=${msg}`, "_blank");
     } catch (e) {
       console.error(e);
       toast.error("Gagal memproses pesanan. Pastikan koneksi & Supabase terhubung.");
@@ -90,7 +91,7 @@ function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+      <div className="mx-auto max-w-3xl px-4 pt-32 pb-20 text-center">
         <ShoppingBag className="mx-auto h-16 w-16 text-muted-foreground/40" />
         <h1 className="mt-4 font-display text-3xl font-bold">Keranjang Kosong</h1>
         <p className="mt-2 text-muted-foreground">Yuk pilih kue tampah favorit Anda.</p>
@@ -102,7 +103,7 @@ function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-32 pb-10 md:px-8">
       <h1 className="font-display text-3xl font-bold text-foreground">Keranjang Belanja</h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
