@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles, ShieldCheck, Truck, Package, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  Truck,
+  Package,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { supabase, type Product, type Category, type HomepageHero } from "@/lib/supabase";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useState, useEffect } from "react";
@@ -12,8 +21,7 @@ export const Route = createFileRoute("/_site/")({
       { title: `${SITE_CONFIG.name} — Suguhan Acara Khas Makassar` },
       {
         name: "description",
-        content:
-          `Pesan paket kue tampah, jajanan pasar Makassar, kue dos & suguhan acara di ${SITE_CONFIG.addressShort}. Halal, fresh, custom isi.`,
+        content: `Pesan paket kue tampah, jajanan pasar Makassar, kue dos & suguhan acara di ${SITE_CONFIG.addressShort}. Halal, fresh, custom isi.`,
       },
       { property: "og:title", content: SITE_CONFIG.name },
       { property: "og:description", content: SITE_CONFIG.description },
@@ -30,9 +38,18 @@ const features = [
 ];
 
 const testimonials = [
-  { name: "Siti Nurhaliza", text: "Kuenya enak, segar, dan cantik. Pelayanan ramah dan pengiriman tepat waktu. Pasti langganan lagi!" },
-  { name: "Andi Pratama", text: "Cocok untuk acara keluarga. Semua tamu suka rasanya. Tampahnya juga cantik dan rapi." },
-  { name: "Dewi Kartika", text: "Variasinya banyak dan rasanya nampol. Harga sesuai kualitas. Recommended!" },
+  {
+    name: "Siti Nurhaliza",
+    text: "Kuenya enak, segar, dan cantik. Pelayanan ramah dan pengiriman tepat waktu. Pasti langganan lagi!",
+  },
+  {
+    name: "Andi Pratama",
+    text: "Cocok untuk acara keluarga. Semua tamu suka rasanya. Tampahnya juga cantik dan rapi.",
+  },
+  {
+    name: "Dewi Kartika",
+    text: "Variasinya banyak dan rasanya nampol. Harga sesuai kualitas. Recommended!",
+  },
 ];
 
 const faqs = [
@@ -75,7 +92,12 @@ function HomePage() {
   const { data: heroContent } = useQuery({
     queryKey: ["homepage-hero"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("homepage_hero").select("*").eq("id", "home").eq("is_active", true).maybeSingle();
+      const { data, error } = await supabase
+        .from("homepage_hero")
+        .select("*")
+        .eq("id", "home")
+        .eq("is_active", true)
+        .maybeSingle();
       if (error) throw error;
       return data as HomepageHero | null;
     },
@@ -107,7 +129,8 @@ function HomePage() {
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
 
   const nextSlide = () => setCurrentHeroImage((prev) => (prev + 1) % heroImages.length);
-  const prevSlide = () => setCurrentHeroImage((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  const prevSlide = () =>
+    setCurrentHeroImage((prev) => (prev - 1 + heroImages.length) % heroImages.length);
 
   useEffect(() => {
     if (heroImages.length > 1) {
@@ -124,16 +147,18 @@ function HomePage() {
         <div className="absolute inset-0 z-0 bg-zinc-950">
           {heroImages.length > 0 ? (
             heroImages.map((img, i) => (
-              <img 
-                key={i} 
-                src={img} 
-                alt={`${hero.image_alt} ${i + 1}`} 
-                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === currentHeroImage ? "opacity-100" : "opacity-0"}`} 
+              <img
+                key={i}
+                src={img}
+                alt={`${hero.image_alt} ${i + 1}`}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === currentHeroImage ? "opacity-100" : "opacity-0"}`}
               />
             ))
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 via-zinc-900 to-zinc-950">
-               <div className="font-display text-8xl font-bold text-white/5">{SITE_CONFIG.shortName}</div>
+              <div className="font-display text-8xl font-bold text-white/5">
+                {SITE_CONFIG.shortName}
+              </div>
             </div>
           )}
           {/* Overlay to ensure text readability */}
@@ -143,21 +168,21 @@ function HomePage() {
         {/* Manual Controls */}
         {heroImages.length > 1 && (
           <>
-            <button 
+            <button
               onClick={prevSlide}
               className="absolute left-4 z-20 flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-black/20 text-white/70 backdrop-blur-md transition-all hover:bg-black/40 hover:text-white"
               aria-label="Previous Slide"
             >
               <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
             </button>
-            <button 
+            <button
               onClick={nextSlide}
               className="absolute right-4 z-20 flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-black/20 text-white/70 backdrop-blur-md transition-all hover:bg-black/40 hover:text-white"
               aria-label="Next Slide"
             >
               <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
             </button>
-            
+
             {/* Dots */}
             <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-2">
               {heroImages.map((_, i) => (
@@ -175,7 +200,9 @@ function HomePage() {
         {/* Hero Content */}
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-24 pb-12 md:px-8">
           <div className="max-w-2xl text-white">
-            <p className="font-display text-lg italic text-primary drop-shadow-md">{hero.eyebrow}</p>
+            <p className="font-display text-lg italic text-primary drop-shadow-md">
+              {hero.eyebrow}
+            </p>
             <h1 className="mt-2 font-display text-5xl font-bold leading-[1.05] drop-shadow-lg md:text-7xl">
               {hero.title} <br /> <span className="text-primary">{hero.highlight_text}</span>
             </h1>
@@ -224,7 +251,11 @@ function HomePage() {
             >
               <div className="aspect-square overflow-hidden bg-gradient-to-br from-secondary to-muted relative">
                 {c.image_url ? (
-                  <img src={c.image_url} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img
+                    src={c.image_url}
+                    alt={c.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                 ) : (
                   <div className="flex h-full items-center justify-center font-display text-4xl text-primary/30">
                     {c.name.charAt(0)}
@@ -246,9 +277,14 @@ function HomePage() {
           <div className="flex items-end justify-between">
             <div>
               <h2 className="font-display text-3xl font-bold text-primary">Produk Unggulan</h2>
-              <p className="mt-2 text-muted-foreground">Pilihan terbaik untuk momen spesial Anda.</p>
+              <p className="mt-2 text-muted-foreground">
+                Pilihan terbaik untuk momen spesial Anda.
+              </p>
             </div>
-            <Link to="/produk" className="hidden text-sm font-semibold text-primary hover:underline md:inline-flex">
+            <Link
+              to="/produk"
+              className="hidden text-sm font-semibold text-primary hover:underline md:inline-flex"
+            >
               Lihat semua →
             </Link>
           </div>
@@ -294,7 +330,9 @@ function HomePage() {
       {/* FAQ */}
       <section className="bg-secondary/40 py-16">
         <div className="mx-auto max-w-3xl px-4 md:px-8">
-          <h2 className="text-center font-display text-3xl font-bold text-primary">Pertanyaan yang Sering Ditanya</h2>
+          <h2 className="text-center font-display text-3xl font-bold text-primary">
+            Pertanyaan yang Sering Ditanya
+          </h2>
           <div className="mt-8 space-y-3">
             {faqs.map((f, i) => (
               <FaqItem key={i} q={f.q} a={f.a} />
@@ -307,13 +345,25 @@ function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary/70 p-10 text-primary-foreground md:p-16">
           <div className="md:max-w-xl">
-            <h2 className="font-display text-3xl font-bold md:text-4xl">Siap memesan untuk acara Anda?</h2>
-            <p className="mt-3 opacity-90">Hubungi kami sekarang dan dapatkan paket suguhan terbaik untuk tamu istimewa.</p>
+            <h2 className="font-display text-3xl font-bold md:text-4xl">
+              Siap memesan untuk acara Anda?
+            </h2>
+            <p className="mt-3 opacity-90">
+              Hubungi kami sekarang dan dapatkan paket suguhan terbaik untuk tamu istimewa.
+            </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/produk" className="inline-flex rounded-full bg-background px-6 py-3 text-sm font-semibold text-primary hover:opacity-90">
+              <Link
+                to="/produk"
+                className="inline-flex rounded-full bg-background px-6 py-3 text-sm font-semibold text-primary hover:opacity-90"
+              >
                 Lihat Katalog
               </Link>
-              <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noopener" className="inline-flex rounded-full border-2 border-background px-6 py-3 text-sm font-semibold text-background hover:bg-background hover:text-primary">
+              <a
+                href={SOCIAL_LINKS.whatsapp}
+                target="_blank"
+                rel="noopener"
+                className="inline-flex rounded-full border-2 border-background px-6 py-3 text-sm font-semibold text-background hover:bg-background hover:text-primary"
+              >
                 Chat WhatsApp
               </a>
             </div>
@@ -324,7 +374,15 @@ function HomePage() {
   );
 }
 
-function HeroAction({ href, variant, children }: { href: string; variant: "primary" | "secondary"; children: React.ReactNode }) {
+function HeroAction({
+  href,
+  variant,
+  children,
+}: {
+  href: string;
+  variant: "primary" | "secondary";
+  children: React.ReactNode;
+}) {
   const className =
     variant === "primary"
       ? "inline-flex items-center gap-2 rounded-full bg-accent px-8 py-3 text-sm font-semibold text-accent-foreground shadow-sm transition hover:opacity-90"
@@ -354,7 +412,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left font-semibold text-foreground"
       >
         {q}
-        <ChevronDown className={`h-5 w-5 shrink-0 text-primary transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-5 w-5 shrink-0 text-primary transition ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && <div className="px-5 pb-4 text-sm text-muted-foreground">{a}</div>}
     </div>

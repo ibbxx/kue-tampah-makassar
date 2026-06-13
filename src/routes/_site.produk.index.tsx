@@ -17,7 +17,10 @@ export const Route = createFileRoute("/_site/produk/")({
   head: () => ({
     meta: [
       { title: `Produk — ${SITE_CONFIG.name}` },
-      { name: "description", content: `Katalog lengkap kue tampah, jajanan pasar, dan suguhan acara khas ${SITE_CONFIG.city}.` },
+      {
+        name: "description",
+        content: `Katalog lengkap kue tampah, jajanan pasar, dan suguhan acara khas ${SITE_CONFIG.city}.`,
+      },
       { property: "og:title", content: "Produk Kue Tampah" },
       { property: "og:description", content: "Pilih kue tampah favorit Anda." },
     ],
@@ -27,13 +30,17 @@ export const Route = createFileRoute("/_site/produk/")({
 
 function ProductsPage() {
   const { q, kategori } = Route.useSearch();
-  const navigate = useNavigate({ from: "/produk" });
+  const navigate = useNavigate();
   const [query, setQuery] = useState(q ?? "");
 
   const { data: products } = useQuery({
     queryKey: ["products", "all"],
     queryFn: async () => {
-      const { data } = await supabase.from("products").select("*").eq("is_active", true).order("created_at", { ascending: false });
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
       return (data ?? []) as Product[];
     },
   });
@@ -53,7 +60,9 @@ function ProductsPage() {
     }
     if (query) {
       const t = query.toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(t) || (p.description ?? "").toLowerCase().includes(t));
+      list = list.filter(
+        (p) => p.name.toLowerCase().includes(t) || (p.description ?? "").toLowerCase().includes(t),
+      );
     }
     return list;
   }, [products, categories, query, kategori]);
@@ -62,14 +71,23 @@ function ProductsPage() {
     <div className="mx-auto max-w-7xl px-4 pt-32 pb-12 md:px-8">
       <div className="text-center">
         <h1 className="font-display text-4xl font-bold text-primary">Produk Kami</h1>
-        <p className="mt-2 text-muted-foreground">Temukan aneka kue tampah terbaik untuk setiap momen spesial Anda.</p>
+        <p className="mt-2 text-muted-foreground">
+          Temukan aneka kue tampah terbaik untuk setiap momen spesial Anda.
+        </p>
       </div>
 
       <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, q: query || undefined }), replace: true });
+            navigate({
+              to: "/produk",
+              search: {
+                q: query || undefined,
+                kategori: kategori || undefined,
+              },
+              replace: true,
+            });
           }}
           className="group relative w-full md:max-w-md"
         >
@@ -79,7 +97,14 @@ function ProductsPage() {
             onChange={(e) => {
               const val = e.target.value;
               setQuery(val);
-              navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, q: val || undefined }), replace: true });
+              navigate({
+                to: "/produk",
+                search: {
+                  q: val || undefined,
+                  kategori: kategori || undefined,
+                },
+                replace: true,
+              });
             }}
             placeholder="Cari kue tampah..."
             className="peer h-11 w-full rounded-full border border-border bg-background pl-10 pr-4 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_15px_rgba(var(--primary),0.2)] focus:ring-2 focus:ring-primary/20"
@@ -87,14 +112,35 @@ function ProductsPage() {
         </form>
 
         <div className="flex flex-wrap gap-2">
-          <FilterPill active={!kategori} onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: undefined }), replace: true })}>
+          <FilterPill
+            active={!kategori}
+            onClick={() =>
+              navigate({
+                to: "/produk",
+                search: {
+                  q: query || undefined,
+                  kategori: undefined,
+                },
+                replace: true,
+              })
+            }
+          >
             Semua
           </FilterPill>
           {(categories ?? []).map((c) => (
             <FilterPill
               key={c.id}
               active={kategori === c.slug}
-              onClick={() => navigate({ search: (prev: { q?: string; kategori?: string }) => ({ ...prev, kategori: c.slug }), replace: true })}
+              onClick={() =>
+                navigate({
+                  to: "/produk",
+                  search: {
+                    q: query || undefined,
+                    kategori: c.slug,
+                  },
+                  replace: true,
+                })
+              }
             >
               {c.name}
             </FilterPill>
@@ -114,7 +160,9 @@ function ProductsPage() {
             ? "Tidak ada produk yang cocok dengan pencarian Anda."
             : "Belum ada produk. Admin sedang menyiapkan menu terbaik."}
           <div className="mt-4">
-            <Link to="/" className="text-sm font-semibold text-primary hover:underline">← Kembali ke beranda</Link>
+            <Link to="/" className="text-sm font-semibold text-primary hover:underline">
+              ← Kembali ke beranda
+            </Link>
           </div>
         </div>
       )}
@@ -122,7 +170,15 @@ function ProductsPage() {
   );
 }
 
-function FilterPill({ children, active, onClick }: { children: React.ReactNode; active?: boolean; onClick: () => void }) {
+function FilterPill({
+  children,
+  active,
+  onClick,
+}: {
+  children: React.ReactNode;
+  active?: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"

@@ -17,16 +17,19 @@ import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as AdminStokRouteImport } from './routes/admin.stok'
 import { Route as AdminProdukRouteImport } from './routes/admin.produk'
 import { Route as AdminPesanRouteImport } from './routes/admin.pesan'
+import { Route as AdminPembayaranRouteImport } from './routes/admin.pembayaran'
 import { Route as AdminPanduanRouteImport } from './routes/admin.panduan'
 import { Route as AdminOrderRouteImport } from './routes/admin.order'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminArtikelRouteImport } from './routes/admin.artikel'
 import { Route as SiteTentangRouteImport } from './routes/_site.tentang'
+import { Route as SiteLacakRouteImport } from './routes/_site.lacak'
 import { Route as SiteKontakRouteImport } from './routes/_site.kontak'
 import { Route as SiteKeranjangRouteImport } from './routes/_site.keranjang'
-import { Route as SiteArtikelRouteImport } from './routes/_site.artikel'
 import { Route as SiteProdukIndexRouteImport } from './routes/_site.produk.index'
+import { Route as SiteArtikelIndexRouteImport } from './routes/_site.artikel.index'
 import { Route as SiteProdukSlugRouteImport } from './routes/_site.produk.$slug'
+import { Route as SiteOrderIdRouteImport } from './routes/_site.order.$id'
 import { Route as SiteArtikelSlugRouteImport } from './routes/_site.artikel.$slug'
 
 const LoginRoute = LoginRouteImport.update({
@@ -68,6 +71,11 @@ const AdminPesanRoute = AdminPesanRouteImport.update({
   path: '/pesan',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPembayaranRoute = AdminPembayaranRouteImport.update({
+  id: '/pembayaran',
+  path: '/pembayaran',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPanduanRoute = AdminPanduanRouteImport.update({
   id: '/panduan',
   path: '/panduan',
@@ -93,6 +101,11 @@ const SiteTentangRoute = SiteTentangRouteImport.update({
   path: '/tentang',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteLacakRoute = SiteLacakRouteImport.update({
+  id: '/lacak',
+  path: '/lacak',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteKontakRoute = SiteKontakRouteImport.update({
   id: '/kontak',
   path: '/kontak',
@@ -103,14 +116,14 @@ const SiteKeranjangRoute = SiteKeranjangRouteImport.update({
   path: '/keranjang',
   getParentRoute: () => SiteRoute,
 } as any)
-const SiteArtikelRoute = SiteArtikelRouteImport.update({
-  id: '/artikel',
-  path: '/artikel',
-  getParentRoute: () => SiteRoute,
-} as any)
 const SiteProdukIndexRoute = SiteProdukIndexRouteImport.update({
   id: '/produk/',
   path: '/produk/',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteArtikelIndexRoute = SiteArtikelIndexRouteImport.update({
+  id: '/artikel/',
+  path: '/artikel/',
   getParentRoute: () => SiteRoute,
 } as any)
 const SiteProdukSlugRoute = SiteProdukSlugRouteImport.update({
@@ -118,49 +131,60 @@ const SiteProdukSlugRoute = SiteProdukSlugRouteImport.update({
   path: '/produk/$slug',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteOrderIdRoute = SiteOrderIdRouteImport.update({
+  id: '/order/$id',
+  path: '/order/$id',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteArtikelSlugRoute = SiteArtikelSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => SiteArtikelRoute,
+  id: '/artikel/$slug',
+  path: '/artikel/$slug',
+  getParentRoute: () => SiteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
-  '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
+  '/lacak': typeof SiteLacakRoute
   '/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/order': typeof AdminOrderRoute
   '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pembayaran': typeof AdminPembayaranRoute
   '/admin/pesan': typeof AdminPesanRoute
   '/admin/produk': typeof AdminProdukRoute
   '/admin/stok': typeof AdminStokRoute
   '/admin/': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
+  '/order/$id': typeof SiteOrderIdRoute
   '/produk/$slug': typeof SiteProdukSlugRoute
+  '/artikel/': typeof SiteArtikelIndexRoute
   '/produk/': typeof SiteProdukIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/artikel': typeof SiteArtikelRouteWithChildren
   '/keranjang': typeof SiteKeranjangRoute
   '/kontak': typeof SiteKontakRoute
+  '/lacak': typeof SiteLacakRoute
   '/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/order': typeof AdminOrderRoute
   '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pembayaran': typeof AdminPembayaranRoute
   '/admin/pesan': typeof AdminPesanRoute
   '/admin/produk': typeof AdminProdukRoute
   '/admin/stok': typeof AdminStokRoute
   '/': typeof SiteIndexRoute
   '/admin': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
+  '/order/$id': typeof SiteOrderIdRoute
   '/produk/$slug': typeof SiteProdukSlugRoute
+  '/artikel': typeof SiteArtikelIndexRoute
   '/produk': typeof SiteProdukIndexRoute
 }
 export interface FileRoutesById {
@@ -168,21 +192,24 @@ export interface FileRoutesById {
   '/_site': typeof SiteRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
-  '/_site/artikel': typeof SiteArtikelRouteWithChildren
   '/_site/keranjang': typeof SiteKeranjangRoute
   '/_site/kontak': typeof SiteKontakRoute
+  '/_site/lacak': typeof SiteLacakRoute
   '/_site/tentang': typeof SiteTentangRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/order': typeof AdminOrderRoute
   '/admin/panduan': typeof AdminPanduanRoute
+  '/admin/pembayaran': typeof AdminPembayaranRoute
   '/admin/pesan': typeof AdminPesanRoute
   '/admin/produk': typeof AdminProdukRoute
   '/admin/stok': typeof AdminStokRoute
   '/_site/': typeof SiteIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_site/artikel/$slug': typeof SiteArtikelSlugRoute
+  '/_site/order/$id': typeof SiteOrderIdRoute
   '/_site/produk/$slug': typeof SiteProdukSlugRoute
+  '/_site/artikel/': typeof SiteArtikelIndexRoute
   '/_site/produk/': typeof SiteProdukIndexRoute
 }
 export interface FileRouteTypes {
@@ -191,60 +218,69 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
-    | '/artikel'
     | '/keranjang'
     | '/kontak'
+    | '/lacak'
     | '/tentang'
     | '/admin/artikel'
     | '/admin/hero'
     | '/admin/order'
     | '/admin/panduan'
+    | '/admin/pembayaran'
     | '/admin/pesan'
     | '/admin/produk'
     | '/admin/stok'
     | '/admin/'
     | '/artikel/$slug'
+    | '/order/$id'
     | '/produk/$slug'
+    | '/artikel/'
     | '/produk/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
-    | '/artikel'
     | '/keranjang'
     | '/kontak'
+    | '/lacak'
     | '/tentang'
     | '/admin/artikel'
     | '/admin/hero'
     | '/admin/order'
     | '/admin/panduan'
+    | '/admin/pembayaran'
     | '/admin/pesan'
     | '/admin/produk'
     | '/admin/stok'
     | '/'
     | '/admin'
     | '/artikel/$slug'
+    | '/order/$id'
     | '/produk/$slug'
+    | '/artikel'
     | '/produk'
   id:
     | '__root__'
     | '/_site'
     | '/admin'
     | '/login'
-    | '/_site/artikel'
     | '/_site/keranjang'
     | '/_site/kontak'
+    | '/_site/lacak'
     | '/_site/tentang'
     | '/admin/artikel'
     | '/admin/hero'
     | '/admin/order'
     | '/admin/panduan'
+    | '/admin/pembayaran'
     | '/admin/pesan'
     | '/admin/produk'
     | '/admin/stok'
     | '/_site/'
     | '/admin/'
     | '/_site/artikel/$slug'
+    | '/_site/order/$id'
     | '/_site/produk/$slug'
+    | '/_site/artikel/'
     | '/_site/produk/'
   fileRoutesById: FileRoutesById
 }
@@ -312,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPesanRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/pembayaran': {
+      id: '/admin/pembayaran'
+      path: '/pembayaran'
+      fullPath: '/admin/pembayaran'
+      preLoaderRoute: typeof AdminPembayaranRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/panduan': {
       id: '/admin/panduan'
       path: '/panduan'
@@ -347,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteTentangRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/lacak': {
+      id: '/_site/lacak'
+      path: '/lacak'
+      fullPath: '/lacak'
+      preLoaderRoute: typeof SiteLacakRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/kontak': {
       id: '/_site/kontak'
       path: '/kontak'
@@ -361,18 +411,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteKeranjangRouteImport
       parentRoute: typeof SiteRoute
     }
-    '/_site/artikel': {
-      id: '/_site/artikel'
-      path: '/artikel'
-      fullPath: '/artikel'
-      preLoaderRoute: typeof SiteArtikelRouteImport
-      parentRoute: typeof SiteRoute
-    }
     '/_site/produk/': {
       id: '/_site/produk/'
       path: '/produk'
       fullPath: '/produk/'
       preLoaderRoute: typeof SiteProdukIndexRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/artikel/': {
+      id: '/_site/artikel/'
+      path: '/artikel'
+      fullPath: '/artikel/'
+      preLoaderRoute: typeof SiteArtikelIndexRouteImport
       parentRoute: typeof SiteRoute
     }
     '/_site/produk/$slug': {
@@ -382,45 +432,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteProdukSlugRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/order/$id': {
+      id: '/_site/order/$id'
+      path: '/order/$id'
+      fullPath: '/order/$id'
+      preLoaderRoute: typeof SiteOrderIdRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/artikel/$slug': {
       id: '/_site/artikel/$slug'
-      path: '/$slug'
+      path: '/artikel/$slug'
       fullPath: '/artikel/$slug'
       preLoaderRoute: typeof SiteArtikelSlugRouteImport
-      parentRoute: typeof SiteArtikelRoute
+      parentRoute: typeof SiteRoute
     }
   }
 }
 
-interface SiteArtikelRouteChildren {
-  SiteArtikelSlugRoute: typeof SiteArtikelSlugRoute
-}
-
-const SiteArtikelRouteChildren: SiteArtikelRouteChildren = {
-  SiteArtikelSlugRoute: SiteArtikelSlugRoute,
-}
-
-const SiteArtikelRouteWithChildren = SiteArtikelRoute._addFileChildren(
-  SiteArtikelRouteChildren,
-)
-
 interface SiteRouteChildren {
-  SiteArtikelRoute: typeof SiteArtikelRouteWithChildren
   SiteKeranjangRoute: typeof SiteKeranjangRoute
   SiteKontakRoute: typeof SiteKontakRoute
+  SiteLacakRoute: typeof SiteLacakRoute
   SiteTentangRoute: typeof SiteTentangRoute
   SiteIndexRoute: typeof SiteIndexRoute
+  SiteArtikelSlugRoute: typeof SiteArtikelSlugRoute
+  SiteOrderIdRoute: typeof SiteOrderIdRoute
   SiteProdukSlugRoute: typeof SiteProdukSlugRoute
+  SiteArtikelIndexRoute: typeof SiteArtikelIndexRoute
   SiteProdukIndexRoute: typeof SiteProdukIndexRoute
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
-  SiteArtikelRoute: SiteArtikelRouteWithChildren,
   SiteKeranjangRoute: SiteKeranjangRoute,
   SiteKontakRoute: SiteKontakRoute,
+  SiteLacakRoute: SiteLacakRoute,
   SiteTentangRoute: SiteTentangRoute,
   SiteIndexRoute: SiteIndexRoute,
+  SiteArtikelSlugRoute: SiteArtikelSlugRoute,
+  SiteOrderIdRoute: SiteOrderIdRoute,
   SiteProdukSlugRoute: SiteProdukSlugRoute,
+  SiteArtikelIndexRoute: SiteArtikelIndexRoute,
   SiteProdukIndexRoute: SiteProdukIndexRoute,
 }
 
@@ -431,6 +482,7 @@ interface AdminRouteChildren {
   AdminHeroRoute: typeof AdminHeroRoute
   AdminOrderRoute: typeof AdminOrderRoute
   AdminPanduanRoute: typeof AdminPanduanRoute
+  AdminPembayaranRoute: typeof AdminPembayaranRoute
   AdminPesanRoute: typeof AdminPesanRoute
   AdminProdukRoute: typeof AdminProdukRoute
   AdminStokRoute: typeof AdminStokRoute
@@ -442,6 +494,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHeroRoute: AdminHeroRoute,
   AdminOrderRoute: AdminOrderRoute,
   AdminPanduanRoute: AdminPanduanRoute,
+  AdminPembayaranRoute: AdminPembayaranRoute,
   AdminPesanRoute: AdminPesanRoute,
   AdminProdukRoute: AdminProdukRoute,
   AdminStokRoute: AdminStokRoute,

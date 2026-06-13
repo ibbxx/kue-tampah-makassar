@@ -6,7 +6,10 @@ export const Route = createFileRoute("/_site/tentang")({
   head: () => ({
     meta: [
       { title: `Tentang Kami — ${SITE_CONFIG.name}` },
-      { name: "description", content: `Cerita di balik ${SITE_CONFIG.name} — pelestari kue tradisional khas ${SITE_CONFIG.city}.` },
+      {
+        name: "description",
+        content: `Cerita di balik ${SITE_CONFIG.name} — pelestari kue tradisional khas ${SITE_CONFIG.city}.`,
+      },
       { property: "og:title", content: `Tentang ${SITE_CONFIG.name}` },
       { property: "og:description", content: `Pelestari rasa tradisional ${SITE_CONFIG.city}.` },
     ],
@@ -19,27 +22,38 @@ function AboutPage() {
     <div className="mx-auto max-w-4xl px-4 pt-32 pb-12 md:px-8">
       <div className="text-center">
         <p className="font-display text-lg italic text-primary">Cerita Kami</p>
-        <h1 className="mt-2 font-display text-4xl font-bold md:text-5xl">Tentang {SITE_CONFIG.name}</h1>
+        <h1 className="mt-2 font-display text-4xl font-bold md:text-5xl">
+          Tentang {SITE_CONFIG.name}
+        </h1>
         <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-          Pelestari kue tradisional {SITE_CONFIG.city} dengan sentuhan modern — siap menemani setiap momen istimewa Anda.
+          Pelestari kue tradisional {SITE_CONFIG.city} dengan sentuhan modern — siap menemani setiap
+          momen istimewa Anda.
         </p>
       </div>
 
       <div className="mt-10 overflow-hidden rounded-2xl">
-        <img src="https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=1200&q=80" alt="Aneka kue tampah" className="h-72 w-full object-cover" />
+        <img
+          src="https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=1200&q=80"
+          alt="Aneka kue tampah"
+          className="h-72 w-full object-cover"
+        />
       </div>
 
       <div className="prose prose-neutral mt-10 max-w-none text-foreground/80">
         <h2 className="font-display text-2xl font-bold text-primary">Latar Belakang</h2>
         <p>
-          {SITE_CONFIG.shortName} hadir dari kecintaan kami terhadap kekayaan kuliner tradisional {SITE_CONFIG.city}. Berawal dari acara keluarga
-          yang membutuhkan suguhan praktis namun tetap istimewa, kami mengembangkan paket tampah yang menggabungkan
-          beragam jajanan khas — mulai dari pie buah, bolu gulung pandan, gogos tuna, risol mayo, kue ku', lumpia,
+          {SITE_CONFIG.shortName} hadir dari kecintaan kami terhadap kekayaan kuliner tradisional{" "}
+          {SITE_CONFIG.city}. Berawal dari acara keluarga yang membutuhkan suguhan praktis namun
+          tetap istimewa, kami mengembangkan paket tampah yang menggabungkan beragam jajanan khas —
+          mulai dari pie buah, bolu gulung pandan, gogos tuna, risol mayo, kue ku', lumpia,
           macaroni, hingga nona manis.
         </p>
 
         <h2 className="mt-8 font-display text-2xl font-bold text-primary">Visi</h2>
-        <p>Menjadi pilihan utama suguhan acara di {SITE_CONFIG.city} dengan menjaga cita rasa tradisional dalam kemasan modern.</p>
+        <p>
+          Menjadi pilihan utama suguhan acara di {SITE_CONFIG.city} dengan menjaga cita rasa
+          tradisional dalam kemasan modern.
+        </p>
 
         <h2 className="mt-8 font-display text-2xl font-bold text-primary">Misi</h2>
         <ul>

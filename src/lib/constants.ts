@@ -4,7 +4,8 @@ export const SITE_CONFIG = {
   branch: "Ratulangi",
   city: "Makassar",
   tagline: "Kue Tradisional, Rasa Istimewa",
-  description: "Suguhan acara cantik & lengkap khas Makassar. Kue tradisional, jajanan pasar, dan paket tampah custom.",
+  description:
+    "Suguhan acara cantik & lengkap khas Makassar. Kue tradisional, jajanan pasar, dan paket tampah custom.",
   address: "Jl. DR. Ratulangi, Mariso, Makassar, Sulawesi Selatan 90125",
   addressShort: "Jl. DR. Ratulangi, Mariso, Makassar",
   phone: "0823-1111-3823",

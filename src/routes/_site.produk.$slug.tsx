@@ -1,6 +1,16 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Minus, Plus, ShoppingCart, ChevronRight, ImageOff, ShieldCheck, Truck, Sparkles, Package } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  ShoppingCart,
+  ChevronRight,
+  ImageOff,
+  ShieldCheck,
+  Truck,
+  Sparkles,
+  Package,
+} from "lucide-react";
 import { useState } from "react";
 import { supabase, type Product, formatRupiah } from "@/lib/supabase";
 import { useCart } from "@/lib/cart";
@@ -11,7 +21,9 @@ export const Route = createFileRoute("/_site/produk/$slug")({
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-4 pt-32 pb-20 text-center">
       <h1 className="font-display text-3xl">Produk tidak ditemukan</h1>
-      <Link to="/produk" className="mt-4 inline-block text-primary hover:underline">← Kembali ke katalog</Link>
+      <Link to="/produk" className="mt-4 inline-block text-primary hover:underline">
+        ← Kembali ke katalog
+      </Link>
     </div>
   ),
 });
@@ -33,13 +45,19 @@ function ProductDetail() {
   });
 
   if (isLoading) {
-    return <div className="mx-auto max-w-7xl px-4 pt-32 pb-20 text-center text-muted-foreground">Memuat...</div>;
+    return (
+      <div className="mx-auto max-w-7xl px-4 pt-32 pb-20 text-center text-muted-foreground">
+        Memuat...
+      </div>
+    );
   }
   if (!product) {
     return (
       <div className="mx-auto max-w-3xl px-4 pt-32 pb-20 text-center">
         <h1 className="font-display text-3xl">Produk tidak ditemukan</h1>
-        <Link to="/produk" className="mt-4 inline-block text-primary hover:underline">← Kembali ke katalog</Link>
+        <Link to="/produk" className="mt-4 inline-block text-primary hover:underline">
+          ← Kembali ke katalog
+        </Link>
       </div>
     );
   }
@@ -48,7 +66,15 @@ function ProductDetail() {
 
   const handleAdd = () => {
     if (product.stock <= 0) return toast.error("Stok habis");
-    add({ productId: product.id, name: product.name, price: Number(product.price), image: images.length > 0 ? images[0] : null }, qty);
+    add(
+      {
+        productId: product.id,
+        name: product.name,
+        price: Number(product.price),
+        image: images.length > 0 ? images[0] : null,
+      },
+      qty,
+    );
     toast.success(`${product.name} (${qty}x) ditambahkan`);
   };
   const handleBuy = () => {
@@ -59,9 +85,13 @@ function ProductDetail() {
   return (
     <div className="mx-auto max-w-7xl px-4 pt-32 pb-10 md:px-8">
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-primary">Beranda</Link>
+        <Link to="/" className="hover:text-primary">
+          Beranda
+        </Link>
         <ChevronRight className="h-3 w-3" />
-        <Link to="/produk" className="hover:text-primary">Produk</Link>
+        <Link to="/produk" className="hover:text-primary">
+          Produk
+        </Link>
         <ChevronRight className="h-3 w-3" />
         <span className="text-foreground">{product.name}</span>
       </nav>
@@ -71,7 +101,11 @@ function ProductDetail() {
           <div className="overflow-hidden rounded-2xl border border-border bg-muted">
             <div className="aspect-square">
               {images.length > 0 ? (
-                <img src={images[activeImage]} alt={product.name} className="h-full w-full object-cover transition-all" />
+                <img
+                  src={images[activeImage]}
+                  alt={product.name}
+                  className="h-full w-full object-cover transition-all"
+                />
               ) : (
                 <div className="flex h-full items-center justify-center text-muted-foreground">
                   <ImageOff className="h-16 w-16" />
@@ -86,10 +120,16 @@ function ProductDetail() {
                   key={i}
                   onClick={() => setActiveImage(i)}
                   className={`relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                    activeImage === i ? "border-primary shadow-sm" : "border-transparent opacity-70 hover:opacity-100"
+                    activeImage === i
+                      ? "border-primary shadow-sm"
+                      : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                 >
-                  <img src={img} alt={`Thumbnail ${i+1}`} className="h-full w-full object-cover" />
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${i + 1}`}
+                    className="h-full w-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -97,15 +137,26 @@ function ProductDetail() {
         </div>
 
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">{product.name}</h1>
-          <p className="mt-2 text-primary">{product.description?.split(".")[0] ?? "Aneka kue tradisional pilihan"}</p>
-          <div className="mt-4 font-display text-3xl font-bold text-primary">{formatRupiah(Number(product.price))}</div>
-          <p className="mt-4 text-sm text-foreground/80">{product.description ?? "Berisi aneka kue tradisional terbaik dengan bahan berkualitas dan cita rasa autentik."}</p>
+          <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+            {product.name}
+          </h1>
+          <p className="mt-2 text-primary">
+            {product.description?.split(".")[0] ?? "Aneka kue tradisional pilihan"}
+          </p>
+          <div className="mt-4 font-display text-3xl font-bold text-primary">
+            {formatRupiah(Number(product.price))}
+          </div>
+          <p className="mt-4 text-sm text-foreground/80">
+            {product.description ??
+              "Berisi aneka kue tradisional terbaik dengan bahan berkualitas dan cita rasa autentik."}
+          </p>
 
           <ul className="mt-6 space-y-2 text-sm">
             {["Cocok untuk berbagai acara", "100% Halal", "Fresh & dibuat setiap hari"].map((b) => (
               <li key={b} className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-accent-foreground">✓</span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                  ✓
+                </span>
                 {b}
               </li>
             ))}
@@ -114,11 +165,17 @@ function ProductDetail() {
           <div className="mt-6 flex items-center gap-4">
             <span className="text-sm text-muted-foreground">Jumlah</span>
             <div className="flex items-center gap-2 rounded-full border border-border">
-              <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted">
+              <button
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"
+              >
                 <Minus className="h-4 w-4" />
               </button>
               <span className="min-w-[2ch] text-center font-semibold">{qty}</span>
-              <button onClick={() => setQty((q) => q + 1)} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted">
+              <button
+                onClick={() => setQty((q) => q + 1)}
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"
+              >
                 <Plus className="h-4 w-4" />
               </button>
             </div>

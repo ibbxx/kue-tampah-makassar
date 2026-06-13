@@ -66,9 +66,7 @@ const sections = [
   },
   {
     title: "9. Pesan Kontak",
-    body: [
-      "Inbox dari form kontak. Tandai sudah dibaca atau hapus jika tidak relevan.",
-    ],
+    body: ["Inbox dari form kontak. Tandai sudah dibaca atau hapus jika tidak relevan."],
   },
   {
     title: "10. Upload gambar",
@@ -92,7 +90,9 @@ function GuidePage() {
           <div key={s.title} className="rounded-2xl border border-border bg-card p-6">
             <h2 className="font-display text-xl font-bold text-primary">{s.title}</h2>
             <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-foreground/80">
-              {s.body.map((b, i) => <li key={i}>{b}</li>)}
+              {s.body.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
             </ul>
           </div>
         ))}

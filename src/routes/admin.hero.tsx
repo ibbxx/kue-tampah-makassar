@@ -38,7 +38,11 @@ function HeroAdmin() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "homepage-hero"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("homepage_hero").select("*").eq("id", "home").maybeSingle();
+      const { data, error } = await supabase
+        .from("homepage_hero")
+        .select("*")
+        .eq("id", "home")
+        .maybeSingle();
       if (error) throw error;
       return data as HomepageHero | null;
     },
@@ -82,9 +86,11 @@ function HeroAdmin() {
       const fileName = `home-hero-${Date.now()}.${fileExt}`;
       const filePath = `hero/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage.from("site-images").upload(filePath, compressedFile, {
-        upsert: true,
-      });
+      const { error: uploadError } = await supabase.storage
+        .from("site-images")
+        .upload(filePath, compressedFile, {
+          upsert: true,
+        });
 
       if (uploadError) throw uploadError;
 
@@ -119,7 +125,8 @@ function HeroAdmin() {
         description: form.description.trim() || defaultHero.description,
         primary_button_label: form.primary_button_label.trim() || defaultHero.primary_button_label,
         primary_button_url: form.primary_button_url.trim() || defaultHero.primary_button_url,
-        secondary_button_label: form.secondary_button_label.trim() || defaultHero.secondary_button_label,
+        secondary_button_label:
+          form.secondary_button_label.trim() || defaultHero.secondary_button_label,
         secondary_button_url: form.secondary_button_url.trim() || defaultHero.secondary_button_url,
         image_alt: form.image_alt.trim() || defaultHero.image_alt,
         updated_at: new Date().toISOString(),
@@ -142,7 +149,9 @@ function HeroAdmin() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold">Atur Hero</h1>
-        <p className="text-sm text-muted-foreground">Kelola teks, tombol, dan gambar utama halaman beranda.</p>
+        <p className="text-sm text-muted-foreground">
+          Kelola teks, tombol, dan gambar utama halaman beranda.
+        </p>
       </div>
 
       {isLoading ? (
@@ -214,8 +223,12 @@ function HeroAdmin() {
                   onChange={(event) => update("is_active", event.target.checked)}
                 />
                 <span>
-                  <span className="block text-sm font-semibold text-foreground">Tampilkan hero custom</span>
-                  <span className="block text-xs text-muted-foreground">Jika dimatikan, homepage memakai fallback bawaan.</span>
+                  <span className="block text-sm font-semibold text-foreground">
+                    Tampilkan hero custom
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    Jika dimatikan, homepage memakai fallback bawaan.
+                  </span>
                 </span>
               </label>
             </div>
@@ -224,30 +237,49 @@ function HeroAdmin() {
           <div className="space-y-5">
             <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground justify-between">
-                <span className="flex items-center gap-2"><ImageIcon className="h-4 w-4 text-primary" /> Gambar Hero</span>
-                <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Bisa lebih dari 1</span>
+                <span className="flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-primary" /> Gambar Hero
+                </span>
+                <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                  Bisa lebih dari 1
+                </span>
               </h2>
-              
+
               {/* Daftar Gambar (Grid) */}
               {(form.image_url ? form.image_url.split(",").filter(Boolean) : []).length > 0 && (
                 <div className="grid grid-cols-2 gap-2 mt-4">
-                  {(form.image_url ? form.image_url.split(",").filter(Boolean) : []).map((url, i) => (
-                    <div key={i} className="group relative aspect-video overflow-hidden rounded-lg border border-border">
-                      <img src={url} alt={`Preview ${i+1}`} className="h-full w-full object-cover transition-transform group-hover:scale-110" />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button type="button" onClick={() => removeImage(i)} className="rounded-full bg-destructive p-1.5 text-destructive-foreground shadow-sm hover:scale-110 transition-transform">
-                          <X className="h-4 w-4" />
-                        </button>
+                  {(form.image_url ? form.image_url.split(",").filter(Boolean) : []).map(
+                    (url, i) => (
+                      <div
+                        key={i}
+                        className="group relative aspect-video overflow-hidden rounded-lg border border-border"
+                      >
+                        <img
+                          src={url}
+                          alt={`Preview ${i + 1}`}
+                          className="h-full w-full object-cover transition-transform group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                          <button
+                            type="button"
+                            onClick={() => removeImage(i)}
+                            className="rounded-full bg-destructive p-1.5 text-destructive-foreground shadow-sm hover:scale-110 transition-transform"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               )}
 
               <div
                 className={cn(
                   "mt-4 flex aspect-video cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition",
-                  uploading ? "border-primary bg-primary/5" : "border-border bg-muted/30 hover:border-primary/50",
+                  uploading
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-muted/30 hover:border-primary/50",
                 )}
                 onDragOver={(event) => {
                   event.preventDefault();
@@ -278,7 +310,9 @@ function HeroAdmin() {
                       type="file"
                       className="hidden"
                       accept="image/*"
-                      onChange={(event) => event.target.files?.[0] && handleUpload(event.target.files[0])}
+                      onChange={(event) =>
+                        event.target.files?.[0] && handleUpload(event.target.files[0])
+                      }
                     />
                   </label>
                 )}

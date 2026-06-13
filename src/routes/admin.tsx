@@ -1,6 +1,18 @@
 import { Outlet, Link, useRouterState, useNavigate, createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, Package, Boxes, Newspaper, ShoppingBag, Mail, BookOpen, LogOut, Loader2, Image as ImageIcon } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Boxes,
+  Newspaper,
+  ShoppingBag,
+  Mail,
+  BookOpen,
+  LogOut,
+  Loader2,
+  Image as ImageIcon,
+  CreditCard,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -17,7 +29,7 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
-  SidebarSeparator
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/admin")({
@@ -33,6 +45,7 @@ const items: NavItem[] = [
   { to: "/admin/stok", label: "Atur Stok", icon: Boxes },
   { to: "/admin/artikel", label: "Atur Artikel", icon: Newspaper },
   { to: "/admin/order", label: "Order Masuk", icon: ShoppingBag },
+  { to: "/admin/pembayaran", label: "Atur Pembayaran", icon: CreditCard },
   { to: "/admin/pesan", label: "Pesan Kontak", icon: Mail },
   { to: "/admin/panduan", label: "Panduan", icon: BookOpen },
 ];
@@ -68,13 +81,20 @@ function AdminLayout() {
         </div>
         <h1 className="font-display text-2xl font-bold text-foreground">Akses Ditolak</h1>
         <p className="mt-2 max-w-md text-muted-foreground">
-          Akun Anda (<strong>{user.email}</strong>) berhasil login, namun belum terdaftar sebagai <strong>Admin</strong> di sistem.
+          Akun Anda (<strong>{user.email}</strong>) berhasil login, namun belum terdaftar sebagai{" "}
+          <strong>Admin</strong> di sistem.
         </p>
         <div className="mt-6 flex gap-3">
-          <button onClick={() => signOut()} className="rounded-full border border-border px-6 py-2 text-sm font-medium hover:bg-muted transition-colors">
+          <button
+            onClick={() => signOut()}
+            className="rounded-full border border-border px-6 py-2 text-sm font-medium hover:bg-muted transition-colors"
+          >
             Keluar & Ganti Akun
           </button>
-          <Link to="/" className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity">
+          <Link
+            to="/"
+            className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+          >
             Kembali ke Beranda
           </Link>
         </div>
@@ -88,9 +108,15 @@ function AdminLayout() {
         <Sidebar variant="sidebar">
           <SidebarHeader className="p-4 pt-6">
             <Link to="/" className="flex items-center gap-3">
-              <img src={SITE_CONFIG.logo} alt={SITE_CONFIG.name} className="h-10 w-auto object-contain dark:invert" />
+              <img
+                src={SITE_CONFIG.logo}
+                alt={SITE_CONFIG.name}
+                className="h-10 w-auto object-contain dark:invert"
+              />
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Admin Panel</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Admin Panel
+                </div>
                 <div className="text-sm font-bold leading-tight">{SITE_CONFIG.shortName}</div>
               </div>
             </Link>
@@ -104,7 +130,12 @@ function AdminLayout() {
                     const active = item.exact ? path === item.to : path.startsWith(item.to);
                     return (
                       <SidebarMenuItem key={item.to}>
-                        <SidebarMenuButton asChild isActive={active} tooltip={item.label} className="font-medium">
+                        <SidebarMenuButton
+                          asChild
+                          isActive={active}
+                          tooltip={item.label}
+                          className="font-medium"
+                        >
                           <Link to={item.to as never}>
                             <item.icon />
                             <span>{item.label}</span>
@@ -120,7 +151,10 @@ function AdminLayout() {
           <SidebarFooter className="p-4 pb-6">
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => signOut()} className="font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                <SidebarMenuButton
+                  onClick={() => signOut()}
+                  className="font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                >
                   <LogOut />
                   <span>Keluar Akun</span>
                 </SidebarMenuButton>
@@ -128,12 +162,15 @@ function AdminLayout() {
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        
+
         <SidebarInset className="flex-1 overflow-hidden flex flex-col">
           <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur px-4">
             <SidebarTrigger className="-ml-2" />
             <div className="w-full flex-1">
-              <h1 className="font-semibold">{items.find((i) => i.exact ? path === i.to : path.startsWith(i.to))?.label || "Admin"}</h1>
+              <h1 className="font-semibold">
+                {items.find((i) => (i.exact ? path === i.to : path.startsWith(i.to)))?.label ||
+                  "Admin"}
+              </h1>
             </div>
           </header>
           <main className="flex-1 overflow-auto p-4 md:p-8 bg-muted/20">

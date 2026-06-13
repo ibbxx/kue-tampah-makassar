@@ -18,12 +18,12 @@ export function useAuth() {
         .eq("user_id", uid)
         .eq("role", "admin")
         .maybeSingle();
-      
+
       if (error) {
         console.error("[useAuth] Error checking role:", error);
       }
       console.log("[useAuth] Role check result for", uid, ":", data);
-      
+
       return !!data;
     };
 
@@ -53,12 +53,12 @@ export function useAuth() {
     };
   }, []);
 
-  return { 
-    user, 
+  return {
+    user,
     isAdmin, // <-- Diperbaiki: Sekarang menggunakan state asli dari pengecekan database, bukan di-hardcode lagi
-    loading, 
+    loading,
     signOut: () => {
       return supabase.auth.signOut();
-    }
+    },
   };
 }

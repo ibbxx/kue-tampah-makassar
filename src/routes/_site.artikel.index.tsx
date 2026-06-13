@@ -4,11 +4,14 @@ import { CalendarDays, ImageOff } from "lucide-react";
 import { supabase, type Article } from "@/lib/supabase";
 import { SITE_CONFIG } from "@/lib/constants";
 
-export const Route = createFileRoute("/_site/artikel")({
+export const Route = createFileRoute("/_site/artikel/")({
   head: () => ({
     meta: [
       { title: `Artikel — ${SITE_CONFIG.name}` },
-      { name: "description", content: `Tips, cerita, dan informasi seputar kue tradisional ${SITE_CONFIG.city}.` },
+      {
+        name: "description",
+        content: `Tips, cerita, dan informasi seputar kue tradisional ${SITE_CONFIG.city}.`,
+      },
       { property: "og:title", content: `Artikel ${SITE_CONFIG.name}` },
       { property: "og:description", content: "Edukasi seputar kue tradisional & paket acara." },
     ],
@@ -43,21 +46,35 @@ function ArticlesPage() {
               key={a.id}
               to="/artikel/$slug"
               params={{ slug: a.slug }}
-              className="group overflow-hidden rounded-2xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-md"
+              aria-label={`Buka artikel ${a.title}`}
+              className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-md"
             >
               <div className="aspect-video overflow-hidden bg-muted">
                 {a.cover_url ? (
-                  <img src={a.cover_url} alt={a.title} className="h-full w-full object-cover transition group-hover:scale-105" />
+                  <img
+                    src={a.cover_url}
+                    alt={a.title}
+                    draggable={false}
+                    className="pointer-events-none h-full w-full select-none object-cover transition group-hover:scale-105"
+                  />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-muted-foreground"><ImageOff className="h-10 w-10" /></div>
+                  <div className="flex h-full items-center justify-center text-muted-foreground">
+                    <ImageOff className="h-10 w-10" />
+                  </div>
                 )}
               </div>
               <div className="p-5">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <CalendarDays className="h-3 w-3" />
-                  {new Date(a.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                  {new Date(a.created_at).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
                 </div>
-                <h3 className="mt-2 font-display text-lg font-bold text-foreground group-hover:text-primary">{a.title}</h3>
+                <h3 className="mt-2 font-display text-lg font-bold text-foreground group-hover:text-primary">
+                  {a.title}
+                </h3>
                 <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{a.excerpt}</p>
               </div>
             </Link>

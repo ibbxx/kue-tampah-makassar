@@ -6,12 +6,7 @@ import { nitro } from "nitro/vite";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [
-    tanstackStart(),
-    nitro(),
-    tailwindcss(),
-    react(),
-  ],
+  plugins: [tanstackStart(), nitro(), tailwindcss(), react()],
   resolve: {
     tsconfigPaths: true,
   },

@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -125,13 +124,20 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  * {
+    border-color: var(--color-border);
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
   }
-  h1, h2, h3, .font-display { font-family: var(--font-display); }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+  }
 }
 
 /* ADMIN THEME (Black & White) */
@@ -141,14 +147,14 @@
   --ring: oklch(0.18 0 0);
   --accent: oklch(0.96 0 0);
   --accent-foreground: oklch(0.18 0 0);
-  
+
   --sidebar: oklch(0.98 0 0);
   --sidebar-foreground: oklch(0.18 0 0);
   --sidebar-primary: oklch(0.18 0 0);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.94 0 0);
   --sidebar-accent-foreground: oklch(0.18 0 0);
-  --sidebar-border: oklch(0.90 0 0);
+  --sidebar-border: oklch(0.9 0 0);
   --sidebar-ring: oklch(0.18 0 0);
 }
 
@@ -158,7 +164,7 @@
   --ring: oklch(0.97 0 0);
   --accent: oklch(0.25 0 0);
   --accent-foreground: oklch(0.97 0 0);
-  
+
   --sidebar: oklch(0.15 0 0);
   --sidebar-foreground: oklch(0.97 0 0);
   --sidebar-primary: oklch(0.97 0 0);

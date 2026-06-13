@@ -35,12 +35,14 @@ export const useCart = create<CartState>()(
           }
           return { items: [...state.items, { ...item, qty }] };
         }),
-      remove: (productId) => set((s) => ({ items: s.items.filter((i) => i.productId !== productId) })),
+      remove: (productId) =>
+        set((s) => ({ items: s.items.filter((i) => i.productId !== productId) })),
       setQty: (productId, qty) =>
         set((s) => ({
-          items: qty <= 0
-            ? s.items.filter((i) => i.productId !== productId)
-            : s.items.map((i) => (i.productId === productId ? { ...i, qty } : i)),
+          items:
+            qty <= 0
+              ? s.items.filter((i) => i.productId !== productId)
+              : s.items.map((i) => (i.productId === productId ? { ...i, qty } : i)),
         })),
       clear: () => set({ items: [] }),
       total: () => get().items.reduce((sum, i) => sum + i.price * i.qty, 0),

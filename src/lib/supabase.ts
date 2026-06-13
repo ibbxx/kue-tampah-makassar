@@ -10,9 +10,13 @@ if (!url || !key) {
   );
 }
 
-export const supabase = createClient(url ?? "https://placeholder.supabase.co", key ?? "placeholder", {
-  auth: { persistSession: true, autoRefreshToken: true },
-});
+export const supabase = createClient(
+  url ?? "https://placeholder.supabase.co",
+  key ?? "placeholder",
+  {
+    auth: { persistSession: true, autoRefreshToken: true },
+  },
+);
 
 export type Product = {
   id: string;
@@ -66,12 +70,16 @@ export type HomepageHero = {
 
 export type Order = {
   id: string;
+  order_number: string | null;
   customer_name: string;
   phone: string;
+  email: string | null;
   address: string | null;
   notes: string | null;
   total: number;
   status: string;
+  payment_method: string;
+  payment_proof_url: string | null;
   created_at: string;
 };
 
@@ -85,5 +93,38 @@ export type ContactMessage = {
   created_at: string;
 };
 
+export type PaymentMethod = {
+  id: string;
+  name: string;
+  type: "bank_transfer" | "cod" | "ewallet";
+  account_number: string | null;
+  account_name: string | null;
+  bank_name: string | null;
+  icon_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+  instructions: string | null;
+  created_at: string;
+};
+
 export const formatRupiah = (n: number) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(n);
+
+/** Upload file to a Supabase storage bucket, returns public URL */
+export async function uploadToStorage(
+  bucket: string,
+  path: string,
+  file: File,
+): Promise<string> {
+  const { error } = await supabase.storage.from(bucket).upload(path, file, {
+    cacheControl: "3600",
+    upsert: true,
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
