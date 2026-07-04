@@ -5,6 +5,7 @@ import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { LazyImage } from "@/components/ui/lazy-image";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +46,7 @@ export function ProductCard({ product }: { product: Product }) {
         <button className="group flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-left transition hover:-translate-y-1 hover:shadow-lg focus:outline-none">
           <div className="relative aspect-square w-full overflow-hidden bg-muted">
             {product.image_url ? (
-              <img
+              <LazyImage
                 src={product.image_url.split(",")[0]}
                 alt={product.name}
                 className="h-full w-full object-cover transition group-hover:scale-105"
@@ -103,7 +104,7 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted relative">
             {product.image_url ? (
               <>
-                <img
+                <LazyImage
                   src={product.image_url.split(",")[0]}
                   alt={product.name}
                   className="h-full w-full object-cover"

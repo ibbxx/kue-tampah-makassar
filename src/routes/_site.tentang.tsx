@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Heart, Sparkles, Users, Award } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 export const Route = createFileRoute("/_site/tentang")({
   head: () => ({
@@ -32,7 +33,7 @@ function AboutPage() {
       </div>
 
       <div className="mt-10 overflow-hidden rounded-2xl">
-        <img
+        <LazyImage
           src="https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=1200&q=80"
           alt="Aneka kue tampah"
           className="h-72 w-full object-cover"

@@ -4,7 +4,7 @@ import { ImageIcon, Loader2, Save, UploadCloud, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import imageCompression from "browser-image-compression";
 import { toast } from "sonner";
-import { supabase, type HomepageHero } from "@/lib/supabase";
+import { supabase, deleteFromStorage, type HomepageHero } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/hero")({
@@ -76,11 +76,17 @@ function HeroAdmin() {
 
     try {
       setUploading(true);
-      const compressedFile = await imageCompression(file, {
-        maxSizeMB: 0.8,
-        maxWidthOrHeight: 1800,
-        useWebWorker: true,
-      });
+      let fileToUpload = file;
+
+      if (file.size > 200 * 1024) {
+        toast.info("Gambar lebih dari 200KB, mengompres otomatis...");
+        fileToUpload = await imageCompression(file, {
+          maxSizeMB: 0.19,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          initialQuality: 0.9,
+        });
+      }
 
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `home-hero-${Date.now()}.${fileExt}`;
@@ -88,7 +94,7 @@ function HeroAdmin() {
 
       const { error: uploadError } = await supabase.storage
         .from("site-images")
-        .upload(filePath, compressedFile, {
+        .upload(filePath, fileToUpload, {
           upsert: true,
         });
 
@@ -132,8 +138,16 @@ function HeroAdmin() {
         updated_at: new Date().toISOString(),
       };
 
+      const oldUrls = data?.image_url ? data.image_url.split(",").filter(Boolean) : [];
+      const newUrls = payload.image_url ? payload.image_url.split(",").filter(Boolean) : [];
+      const deletedUrls = oldUrls.filter((url) => !newUrls.includes(url));
+
       const { error } = await supabase.from("homepage_hero").upsert(payload, { onConflict: "id" });
       if (error) throw error;
+
+      for (const url of deletedUrls) {
+        await deleteFromStorage(url);
+      }
 
       toast.success("Hero homepage tersimpan");
       qc.invalidateQueries({ queryKey: ["admin", "homepage-hero"] });

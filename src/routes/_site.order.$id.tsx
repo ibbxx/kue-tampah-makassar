@@ -19,6 +19,7 @@ import { useState, useRef } from "react";
 import { supabase, formatRupiah, uploadToStorage, type Order } from "@/lib/supabase";
 import { toast } from "sonner";
 import { SITE_CONFIG } from "@/lib/constants";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 export const Route = createFileRoute("/_site/order/$id")({
   head: () => ({
@@ -307,7 +308,7 @@ function OrderConfirmationPage() {
                 {order.payment_proof_url ? (
                   <div className="space-y-3">
                     <div className="overflow-hidden rounded-xl border border-border">
-                      <img
+                      <LazyImage
                         src={order.payment_proof_url}
                         alt="Bukti Transfer"
                         className="w-full max-h-[300px] object-contain bg-muted"

@@ -128,3 +128,29 @@ export async function uploadToStorage(
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }
+
+/** Delete a file from Supabase storage using its public URL */
+export async function deleteFromStorage(publicUrl: string): Promise<void> {
+  try {
+    if (!publicUrl) return;
+
+    // Example: https://xxxx.supabase.co/storage/v1/object/public/site-images/article-123.jpg
+    const marker = "/storage/v1/object/public/";
+    const index = publicUrl.indexOf(marker);
+    if (index === -1) return; // Not a standard Supabase storage public URL
+
+    const pathAndBucket = publicUrl.substring(index + marker.length);
+    const firstSlash = pathAndBucket.indexOf("/");
+    if (firstSlash === -1) return;
+
+    const bucket = pathAndBucket.substring(0, firstSlash);
+    const filePath = decodeURIComponent(pathAndBucket.substring(firstSlash + 1));
+
+    const { error } = await supabase.storage.from(bucket).remove([filePath]);
+    if (error) {
+      console.error(`Gagal menghapus file dari storage (${bucket}/${filePath}):`, error.message);
+    }
+  } catch (err) {
+    console.error("Gagal dalam deleteFromStorage:", err);
+  }
+}

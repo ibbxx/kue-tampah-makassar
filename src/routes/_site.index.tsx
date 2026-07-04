@@ -14,6 +14,7 @@ import { supabase, type Product, type Category, type HomepageHero } from "@/lib/
 import { ProductCard } from "@/components/site/ProductCard";
 import { useState, useEffect } from "react";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 export const Route = createFileRoute("/_site/")({
   head: () => ({
@@ -251,7 +252,7 @@ function HomePage() {
             >
               <div className="aspect-square overflow-hidden bg-gradient-to-br from-secondary to-muted relative">
                 {c.image_url ? (
-                  <img
+                  <LazyImage
                     src={c.image_url}
                     alt={c.name}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

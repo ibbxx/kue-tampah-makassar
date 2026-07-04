@@ -15,6 +15,7 @@ import { useState } from "react";
 import { supabase, type Product, formatRupiah } from "@/lib/supabase";
 import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 export const Route = createFileRoute("/_site/produk/$slug")({
   component: ProductDetail,
@@ -101,7 +102,7 @@ function ProductDetail() {
           <div className="overflow-hidden rounded-2xl border border-border bg-muted">
             <div className="aspect-square">
               {images.length > 0 ? (
-                <img
+                <LazyImage
                   src={images[activeImage]}
                   alt={product.name}
                   className="h-full w-full object-cover transition-all"
@@ -125,7 +126,7 @@ function ProductDetail() {
                       : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                 >
-                  <img
+                  <LazyImage
                     src={img}
                     alt={`Thumbnail ${i + 1}`}
                     className="h-full w-full object-cover"

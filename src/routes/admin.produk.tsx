@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, X, Package, Boxes, FolderTree } from "lucide-react";
 import { useState } from "react";
-import { supabase, type Product, type Category, formatRupiah } from "@/lib/supabase";
+import { supabase, deleteFromStorage, formatRupiah, type Product, type Category } from "@/lib/supabase";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
 import { UploadCloud, Loader2 } from "lucide-react";
@@ -22,9 +22,11 @@ const slugify = (s: string) =>
 function ProductAdmin() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
-  const [showCategories, setShowCategories] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Partial<Category> | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [showCategories, setShowCategories] = useState(false);
+  const [sessionUploads, setSessionUploads] = useState<string[]>([]);
+  const [sessionCategoryUploads, setSessionCategoryUploads] = useState<string[]>([]);
 
   const { data: products } = useQuery({
     queryKey: ["admin", "products"],
@@ -55,6 +57,24 @@ function ProductAdmin() {
       is_active: editing.is_active ?? true,
       badge: editing.badge ?? null,
     };
+
+    if (editing.id) {
+      const oldProduct = products?.find((p) => p.id === editing.id);
+      const oldUrls = oldProduct?.image_url ? oldProduct.image_url.split(",").filter(Boolean) : [];
+      const newUrls = payload.image_url ? payload.image_url.split(",").filter(Boolean) : [];
+      const deletedUrls = oldUrls.filter((url) => !newUrls.includes(url));
+      for (const url of deletedUrls) {
+        await deleteFromStorage(url);
+      }
+    }
+
+    const savedUrls = payload.image_url ? payload.image_url.split(",").filter(Boolean) : [];
+    const uploadsToDelete = sessionUploads.filter((url) => !savedUrls.includes(url));
+    for (const url of uploadsToDelete) {
+      await deleteFromStorage(url);
+    }
+    setSessionUploads([]);
+
     const { error } = editing.id
       ? await supabase.from("products").update(payload).eq("id", editing.id)
       : await supabase.from("products").insert(payload);
@@ -66,10 +86,25 @@ function ProductAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm("Hapus produk ini?")) return;
+    const product = products?.find((p) => p.id === id);
+    if (product?.image_url) {
+      const urls = product.image_url.split(",").filter(Boolean);
+      for (const url of urls) {
+        await deleteFromStorage(url);
+      }
+    }
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Dihapus");
     qc.invalidateQueries({ queryKey: ["admin", "products"] });
+  };
+
+  const handleCancel = async () => {
+    for (const url of sessionUploads) {
+      await deleteFromStorage(url);
+    }
+    setSessionUploads([]);
+    setEditing(null);
   };
 
   const handleUpload = async (file: File) => {
@@ -77,14 +112,18 @@ function ProductAdmin() {
 
     try {
       setUploading(true);
+      let fileToUpload = file;
 
-      const options = {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 1200,
-        useWebWorker: true,
-      };
-
-      const compressedFile = await imageCompression(file, options);
+      if (file.size > 200 * 1024) {
+        toast.info("Gambar lebih dari 200KB, mengompres otomatis...");
+        const options = {
+          maxSizeMB: 0.19,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          initialQuality: 0.9,
+        };
+        fileToUpload = await imageCompression(file, options);
+      }
 
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
@@ -92,7 +131,7 @@ function ProductAdmin() {
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
-        .upload(filePath, compressedFile);
+        .upload(filePath, fileToUpload);
 
       if (uploadError) throw uploadError;
 
@@ -102,6 +141,7 @@ function ProductAdmin() {
 
       const images = editing.image_url ? editing.image_url.split(",").filter(Boolean) : [];
       setEditing({ ...editing, image_url: [...images, publicUrl].join(",") });
+      setSessionUploads((prev) => [...prev, publicUrl]);
       toast.success("Gambar berhasil diunggah");
     } catch (error: any) {
       toast.error("Gagal mengunggah: " + error.message);
@@ -122,14 +162,18 @@ function ProductAdmin() {
 
     try {
       setUploading(true);
+      let fileToUpload = file;
 
-      const options = {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 1200,
-        useWebWorker: true,
-      };
-
-      const compressedFile = await imageCompression(file, options);
+      if (file.size > 200 * 1024) {
+        toast.info("Gambar lebih dari 200KB, mengompres otomatis...");
+        const options = {
+          maxSizeMB: 0.19,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          initialQuality: 0.9,
+        };
+        fileToUpload = await imageCompression(file, options);
+      }
 
       const fileExt = file.name.split(".").pop();
       const fileName = `category-${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
@@ -137,7 +181,7 @@ function ProductAdmin() {
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
-        .upload(filePath, compressedFile);
+        .upload(filePath, fileToUpload);
 
       if (uploadError) throw uploadError;
 
@@ -146,6 +190,7 @@ function ProductAdmin() {
       } = supabase.storage.from("product-images").getPublicUrl(filePath);
 
       setEditingCategory({ ...editingCategory, image_url: publicUrl });
+      setSessionCategoryUploads((prev) => [...prev, publicUrl]);
       toast.success("Gambar kategori berhasil diunggah");
     } catch (error: any) {
       toast.error("Gagal mengunggah: " + error.message);
@@ -162,6 +207,20 @@ function ProductAdmin() {
       description: editingCategory.description ?? null,
       image_url: editingCategory.image_url ?? null,
     };
+
+    if (editingCategory.id) {
+      const oldCategory = categories?.find((c) => c.id === editingCategory.id);
+      if (oldCategory && oldCategory.image_url && oldCategory.image_url !== payload.image_url) {
+        await deleteFromStorage(oldCategory.image_url);
+      }
+    }
+
+    const uploadsToDelete = sessionCategoryUploads.filter((url) => url !== payload.image_url);
+    for (const url of uploadsToDelete) {
+      await deleteFromStorage(url);
+    }
+    setSessionCategoryUploads([]);
+
     const { error } = editingCategory.id
       ? await supabase.from("categories").update(payload).eq("id", editingCategory.id)
       : await supabase.from("categories").insert(payload);
@@ -174,10 +233,31 @@ function ProductAdmin() {
   const removeCategory = async (id: string) => {
     if (!confirm("Hapus kategori ini? Semua produk di dalamnya akan menjadi tanpa kategori."))
       return;
+    const category = categories?.find((c) => c.id === id);
+    if (category?.image_url) {
+      await deleteFromStorage(category.image_url);
+    }
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Kategori dihapus");
     qc.invalidateQueries({ queryKey: ["categories"] });
+  };
+
+  const handleCategoryCancel = async () => {
+    for (const url of sessionCategoryUploads) {
+      await deleteFromStorage(url);
+    }
+    setSessionCategoryUploads([]);
+    setEditingCategory(null);
+  };
+
+  const handleCloseCategories = async () => {
+    for (const url of sessionCategoryUploads) {
+      await deleteFromStorage(url);
+    }
+    setSessionCategoryUploads([]);
+    setEditingCategory(null);
+    setShowCategories(false);
   };
 
   return (
@@ -268,7 +348,7 @@ function ProductAdmin() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
-            onClick={() => setEditing(null)}
+            onClick={handleCancel}
           />
           <div className="relative w-full max-w-4xl max-h-[95vh] flex flex-col rounded-2xl bg-background shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
@@ -282,7 +362,7 @@ function ProductAdmin() {
                 </p>
               </div>
               <button
-                onClick={() => setEditing(null)}
+                onClick={handleCancel}
                 className="rounded-full p-2 hover:bg-muted text-muted-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
@@ -522,7 +602,7 @@ function ProductAdmin() {
             {/* Footer */}
             <div className="flex items-center justify-end gap-3 border-t border-border bg-muted/30 px-6 py-4 rounded-b-2xl">
               <button
-                onClick={() => setEditing(null)}
+                onClick={handleCancel}
                 className="rounded-full px-5 py-2.5 text-sm font-medium hover:bg-muted transition-colors"
               >
                 Batal
@@ -543,7 +623,7 @@ function ProductAdmin() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
-            onClick={() => setShowCategories(false)}
+            onClick={handleCloseCategories}
           />
           <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl bg-background shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-border px-6 py-5">
@@ -554,7 +634,7 @@ function ProductAdmin() {
                 </p>
               </div>
               <button
-                onClick={() => setShowCategories(false)}
+                onClick={handleCloseCategories}
                 className="rounded-full p-2 hover:bg-muted text-muted-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
@@ -687,7 +767,7 @@ function ProductAdmin() {
 
                     <div className="flex justify-end gap-2 pt-2">
                       <button
-                        onClick={() => setEditingCategory(null)}
+                        onClick={handleCategoryCancel}
                         className="rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-muted transition-colors"
                       >
                         Batal

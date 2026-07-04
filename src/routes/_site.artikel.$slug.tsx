@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, ChevronRight } from "lucide-react";
 import { supabase, type Article } from "@/lib/supabase";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 export const Route = createFileRoute("/_site/artikel/$slug")({
   component: ArticleDetail,
@@ -58,7 +59,7 @@ function ArticleDetail() {
 
       {article.cover_url && (
         <div className="mt-6 overflow-hidden rounded-2xl">
-          <img src={article.cover_url} alt={article.title} className="w-full object-cover" />
+          <LazyImage src={article.cover_url} alt={article.title} className="w-full object-cover" />
         </div>
       )}
 

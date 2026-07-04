@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, ImageOff } from "lucide-react";
 import { supabase, type Article } from "@/lib/supabase";
 import { SITE_CONFIG } from "@/lib/constants";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 export const Route = createFileRoute("/_site/artikel/")({
   head: () => ({
@@ -51,7 +52,7 @@ function ArticlesPage() {
             >
               <div className="aspect-video overflow-hidden bg-muted">
                 {a.cover_url ? (
-                  <img
+                  <LazyImage
                     src={a.cover_url}
                     alt={a.title}
                     draggable={false}

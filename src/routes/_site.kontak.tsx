@@ -64,30 +64,34 @@ function ContactPage() {
         </p>
       </div>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-2">
-        <div className="space-y-4">
-          <ContactCard
-            icon={Phone}
-            title="WhatsApp"
-            text={SITE_CONFIG.phone}
-            href={SOCIAL_LINKS.whatsapp}
-          />
-          <ContactCard
-            icon={Instagram}
-            title="Instagram"
-            text={SITE_CONFIG.instagram}
-            href={SOCIAL_LINKS.instagram}
-          />
-          <ContactCard icon={MapPin} title="Alamat" text={SITE_CONFIG.address} />
-          <ContactCard icon={Clock} title="Jam Buka" text={SITE_CONFIG.openingHours} />
-          <ContactCard
-            icon={Mail}
-            title="Email"
-            text={SITE_CONFIG.email}
-            href={`mailto:${SITE_CONFIG.email}`}
-          />
+      <div className="mt-10 grid gap-8 lg:grid-cols-2 lg:items-start">
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <ContactCard
+              icon={Phone}
+              title="WhatsApp"
+              text={SITE_CONFIG.phone}
+              href={SOCIAL_LINKS.whatsapp}
+            />
+            <ContactCard
+              icon={Instagram}
+              title="Instagram"
+              text={SITE_CONFIG.instagram}
+              href={SOCIAL_LINKS.instagram}
+            />
+            <ContactCard
+              icon={Mail}
+              title="Email"
+              text={SITE_CONFIG.email}
+              href={`mailto:${SITE_CONFIG.email}`}
+            />
+            <ContactCard icon={Clock} title="Jam Buka" text={SITE_CONFIG.openingHours} />
+            <div className="sm:col-span-2">
+              <ContactCard icon={MapPin} title="Alamat" text={SITE_CONFIG.address} />
+            </div>
+          </div>
 
-          <div className="overflow-hidden rounded-2xl border border-border">
+          <div className="overflow-hidden rounded-2xl border border-border transition-all duration-200 hover:border-primary/40 hover:shadow-sm">
             <iframe
               title={`Lokasi ${SITE_CONFIG.name}`}
               src={SITE_CONFIG.mapEmbedUrl}
@@ -97,7 +101,7 @@ function ContactPage() {
           </div>
         </div>
 
-        <form onSubmit={submit} className="rounded-2xl border border-border bg-card p-6">
+        <form onSubmit={submit} className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h2 className="font-display text-xl font-bold">Kirim Pesan</h2>
           <div className="mt-5 space-y-4">
             <Field
@@ -125,7 +129,7 @@ function ContactPage() {
           </div>
           <button
             disabled={submitting}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 font-semibold text-primary-foreground transition-all duration-200 hover:opacity-90 hover:shadow-md active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
           >
             <Send className="h-4 w-4" /> {submitting ? "Mengirim..." : "Kirim Pesan"}
           </button>
@@ -133,7 +137,7 @@ function ContactPage() {
             href={SOCIAL_LINKS.whatsapp}
             target="_blank"
             rel="noopener"
-            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent py-3 font-semibold text-accent hover:bg-accent hover:text-accent-foreground"
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-accent py-3 font-semibold text-accent transition-all duration-200 hover:bg-accent hover:text-accent-foreground hover:shadow-md active:scale-[0.98]"
           >
             <MessageCircle className="h-4 w-4" /> Chat WhatsApp Langsung
           </a>
@@ -155,18 +159,18 @@ function ContactCard({
   href?: string;
 }) {
   const inner = (
-    <div className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40">
+    <div className="flex h-full items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 hover:shadow-sm">
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
         <Icon className="h-5 w-5" />
       </div>
       <div>
         <div className="font-semibold text-foreground">{title}</div>
-        <div className="text-sm text-muted-foreground">{text}</div>
+        <div className="mt-1 text-sm text-muted-foreground">{text}</div>
       </div>
     </div>
   );
   return href ? (
-    <a href={href} target="_blank" rel="noopener">
+    <a href={href} target="_blank" rel="noopener" className="block h-full">
       {inner}
     </a>
   ) : (
@@ -195,14 +199,14 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={4}
-          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
       ) : (
         <input
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
       )}
     </label>

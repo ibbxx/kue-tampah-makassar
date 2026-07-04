@@ -23,6 +23,7 @@ import { useCart } from "@/lib/cart";
 import { formatRupiah, supabase, type PaymentMethod } from "@/lib/supabase";
 import { toast } from "sonner";
 import { SITE_CONFIG } from "@/lib/constants";
+import { LazyImage } from "@/components/ui/lazy-image";
 
 export const Route = createFileRoute("/_site/keranjang")({
   head: () => ({
@@ -363,7 +364,7 @@ function CartStep({
             <div className="col-span-2 flex items-center gap-3 md:col-span-1">
               <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted">
                 {i.image && (
-                  <img src={i.image} alt={i.name} className="h-full w-full object-cover" />
+                  <LazyImage src={i.image} alt={i.name} className="h-full w-full object-cover" />
                 )}
               </div>
               <div>
