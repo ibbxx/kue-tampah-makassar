@@ -1,6 +1,7 @@
 import { Outlet } from "@tanstack/react-router";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { FloatingActions } from "./FloatingActions";
 
 export function SiteLayout() {
   return (
@@ -10,6 +11,7 @@ export function SiteLayout() {
         <Outlet />
       </main>
       <Footer />
+      <FloatingActions />
     </div>
   );
 }

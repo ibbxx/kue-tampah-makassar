@@ -12,6 +12,7 @@ import {
   Loader2,
   Image as ImageIcon,
   CreditCard,
+  UserRound,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -47,6 +48,7 @@ const items: NavItem[] = [
   { to: "/admin/order", label: "Order Masuk", icon: ShoppingBag },
   { to: "/admin/pembayaran", label: "Atur Pembayaran", icon: CreditCard },
   { to: "/admin/pesan", label: "Pesan Kontak", icon: Mail },
+  { to: "/admin/tentang", label: "Tentang Kami", icon: UserRound },
   { to: "/admin/panduan", label: "Panduan", icon: BookOpen },
 ];
 

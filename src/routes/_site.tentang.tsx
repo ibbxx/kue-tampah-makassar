@@ -3,6 +3,8 @@ import { Heart, Sparkles, Users, Award } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
 import { LazyImage } from "@/components/ui/lazy-image";
 import { seoMeta } from "@/lib/seo";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/_site/tentang")({
   head: () => {
@@ -17,6 +19,21 @@ export const Route = createFileRoute("/_site/tentang")({
 });
 
 function AboutPage() {
+  const { data: settings } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("about_image_url")
+        .eq("id", "global")
+        .maybeSingle();
+      if (error) return null;
+      return data;
+    },
+  });
+
+  const imageUrl = settings?.about_image_url || "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=1200&q=80";
+
   return (
     <div className="mx-auto max-w-4xl px-4 pt-32 pb-12 md:px-8">
       <div className="text-center">
@@ -32,7 +49,7 @@ function AboutPage() {
 
       <div className="mt-10 overflow-hidden rounded-2xl">
         <LazyImage
-          src="https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=1200&q=80"
+          src={imageUrl}
           alt="Aneka kue tampah"
           className="h-72 w-full object-cover"
         />

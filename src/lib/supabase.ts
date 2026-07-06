@@ -68,6 +68,12 @@ export type HomepageHero = {
   updated_at: string;
 };
 
+export type SiteSettings = {
+  id: string;
+  about_image_url: string | null;
+  updated_at: string;
+};
+
 export type Order = {
   id: string;
   order_number: string | null;

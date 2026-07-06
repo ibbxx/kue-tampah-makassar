@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
+import { Route as AdminTentangRouteImport } from './routes/admin.tentang'
 import { Route as AdminStokRouteImport } from './routes/admin.stok'
 import { Route as AdminProdukRouteImport } from './routes/admin.produk'
 import { Route as AdminPesanRouteImport } from './routes/admin.pesan'
@@ -61,6 +62,11 @@ const SiteIndexRoute = SiteIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SiteRoute,
+} as any)
+const AdminTentangRoute = AdminTentangRouteImport.update({
+  id: '/tentang',
+  path: '/tentang',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminStokRoute = AdminStokRouteImport.update({
   id: '/stok',
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/admin/pesan': typeof AdminPesanRoute
   '/admin/produk': typeof AdminProdukRoute
   '/admin/stok': typeof AdminStokRoute
+  '/admin/tentang': typeof AdminTentangRoute
   '/admin/': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
   '/order/$id': typeof SiteOrderIdRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/admin/pesan': typeof AdminPesanRoute
   '/admin/produk': typeof AdminProdukRoute
   '/admin/stok': typeof AdminStokRoute
+  '/admin/tentang': typeof AdminTentangRoute
   '/': typeof SiteIndexRoute
   '/admin': typeof AdminIndexRoute
   '/artikel/$slug': typeof SiteArtikelSlugRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/admin/pesan': typeof AdminPesanRoute
   '/admin/produk': typeof AdminProdukRoute
   '/admin/stok': typeof AdminStokRoute
+  '/admin/tentang': typeof AdminTentangRoute
   '/_site/': typeof SiteIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_site/artikel/$slug': typeof SiteArtikelSlugRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/admin/pesan'
     | '/admin/produk'
     | '/admin/stok'
+    | '/admin/tentang'
     | '/admin/'
     | '/artikel/$slug'
     | '/order/$id'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/admin/pesan'
     | '/admin/produk'
     | '/admin/stok'
+    | '/admin/tentang'
     | '/'
     | '/admin'
     | '/artikel/$slug'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/admin/pesan'
     | '/admin/produk'
     | '/admin/stok'
+    | '/admin/tentang'
     | '/_site/'
     | '/admin/'
     | '/_site/artikel/$slug'
@@ -346,6 +358,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof SiteIndexRouteImport
       parentRoute: typeof SiteRoute
+    }
+    '/admin/tentang': {
+      id: '/admin/tentang'
+      path: '/tentang'
+      fullPath: '/admin/tentang'
+      preLoaderRoute: typeof AdminTentangRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/stok': {
       id: '/admin/stok'
@@ -506,6 +525,7 @@ interface AdminRouteChildren {
   AdminPesanRoute: typeof AdminPesanRoute
   AdminProdukRoute: typeof AdminProdukRoute
   AdminStokRoute: typeof AdminStokRoute
+  AdminTentangRoute: typeof AdminTentangRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -518,6 +538,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPesanRoute: AdminPesanRoute,
   AdminProdukRoute: AdminProdukRoute,
   AdminStokRoute: AdminStokRoute,
+  AdminTentangRoute: AdminTentangRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

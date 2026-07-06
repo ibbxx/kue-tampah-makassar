@@ -5,6 +5,7 @@ import { useState } from "react";
 import { supabase, uploadToStorage, deleteFromStorage, type Article } from "@/lib/supabase";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 
 export const Route = createFileRoute("/admin/artikel")({ component: ArticleAdmin });
 
@@ -279,13 +280,13 @@ function ArticleAdmin() {
                 onChange={(v) => setEditing({ ...editing, excerpt: v })}
                 textarea
               />
-              <Input
-                label="Konten"
-                value={editing.content ?? ""}
-                onChange={(v) => setEditing({ ...editing, content: v })}
-                textarea
-                rows={10}
-              />
+              <div className="space-y-2">
+                <span className="text-xs font-medium text-muted-foreground">Konten</span>
+                <RichTextEditor
+                  value={editing.content ?? ""}
+                  onChange={(v) => setEditing({ ...editing, content: v })}
+                />
+              </div>
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
