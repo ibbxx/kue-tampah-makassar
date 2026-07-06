@@ -72,38 +72,66 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 import { SITE_CONFIG } from "@/lib/constants";
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: `${SITE_CONFIG.name} — Kue Tradisional Khas Makassar` },
-      { name: "description", content: SITE_CONFIG.description },
-      { name: "author", content: SITE_CONFIG.name },
-      { property: "og:title", content: SITE_CONFIG.name },
-      { property: "og:description", content: SITE_CONFIG.description },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
-      },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    head: () => ({
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: `${SITE_CONFIG.name} — Kue Tradisional Khas Makassar` },
+        { name: "description", content: SITE_CONFIG.description },
+        { name: "author", content: SITE_CONFIG.name },
+        {
+          name: "robots",
+          content: "index, follow, max-image-preview:large, max-snippet:-1",
+        },
+        { name: "theme-color", content: "#1a1a2e" },
+
+        // Open Graph
+        { property: "og:title", content: `${SITE_CONFIG.name} — Kue Tradisional Khas Makassar` },
+        { property: "og:description", content: SITE_CONFIG.description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: SITE_CONFIG.url },
+        { property: "og:site_name", content: SITE_CONFIG.name },
+        { property: "og:locale", content: "id_ID" },
+        { property: "og:image", content: `${SITE_CONFIG.url}/logo.png` },
+        { property: "og:image:width", content: "512" },
+        { property: "og:image:height", content: "512" },
+        { property: "og:image:alt", content: SITE_CONFIG.name },
+
+        // Twitter Card
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:title", content: SITE_CONFIG.name },
+        { name: "twitter:description", content: SITE_CONFIG.description },
+        { name: "twitter:image", content: `${SITE_CONFIG.url}/logo.png` },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "canonical", href: SITE_CONFIG.url },
+        { rel: "icon", type: "image/png", href: "/logo.png" },
+        { rel: "apple-touch-icon", href: "/logo.png" },
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossOrigin: "anonymous",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+        },
+      ],
+    }),
+    shellComponent: RootShell,
+    component: RootComponent,
+    notFoundComponent: NotFoundComponent,
+    errorComponent: ErrorComponent,
+  },
+);
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <HeadContent />
       </head>

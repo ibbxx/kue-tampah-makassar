@@ -2,19 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Heart, Sparkles, Users, Award } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { seoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_site/tentang")({
-  head: () => ({
-    meta: [
-      { title: `Tentang Kami — ${SITE_CONFIG.name}` },
-      {
-        name: "description",
-        content: `Cerita di balik ${SITE_CONFIG.name} — pelestari kue tradisional khas ${SITE_CONFIG.city}.`,
-      },
-      { property: "og:title", content: `Tentang ${SITE_CONFIG.name}` },
-      { property: "og:description", content: `Pelestari rasa tradisional ${SITE_CONFIG.city}.` },
-    ],
-  }),
+  head: () => {
+    const { meta, links } = seoMeta({
+      title: "Tentang Kami",
+      description: `Cerita di balik ${SITE_CONFIG.name} — pelestari kue tradisional khas ${SITE_CONFIG.city}. Visi, misi, dan komitmen kami.`,
+      path: "/tentang",
+    });
+    return { meta, links };
+  },
   component: AboutPage,
 });
 

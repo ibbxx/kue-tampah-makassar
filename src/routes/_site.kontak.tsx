@@ -5,19 +5,17 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
+import { seoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_site/kontak")({
-  head: () => ({
-    meta: [
-      { title: `Kontak — ${SITE_CONFIG.name}` },
-      {
-        name: "description",
-        content: `Hubungi ${SITE_CONFIG.name} di ${SITE_CONFIG.addressShort}. WhatsApp ${SITE_CONFIG.phone}.`,
-      },
-      { property: "og:title", content: `Kontak ${SITE_CONFIG.name}` },
-      { property: "og:description", content: "Pesan & informasi outlet di Makassar." },
-    ],
-  }),
+  head: () => {
+    const { meta, links } = seoMeta({
+      title: "Kontak & Lokasi",
+      description: `Hubungi ${SITE_CONFIG.name} di ${SITE_CONFIG.addressShort}. WhatsApp ${SITE_CONFIG.phone}. Buka ${SITE_CONFIG.openingHours}.`,
+      path: "/kontak",
+    });
+    return { meta, links };
+  },
   component: ContactPage,
 });
 

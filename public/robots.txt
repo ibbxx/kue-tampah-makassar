@@ -1,0 +1,48 @@
+# =============================================================
+# Kue Tampah Ratulangi — robots.txt
+# Mengizinkan semua crawler termasuk bot AI
+# =============================================================
+
+# Semua bot standar (Googlebot, Bingbot, dll.)
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /keranjang
+Disallow: /order/
+Disallow: /lacak
+
+# Google AI Overview & Gemini
+User-agent: Google-Extended
+Allow: /
+
+# GPTBot (ChatGPT / OpenAI)
+User-agent: GPTBot
+Allow: /
+
+# ClaudeBot (Anthropic / Claude)
+User-agent: ClaudeBot
+Allow: /
+
+# ChatGPT User (browsing mode)
+User-agent: ChatGPT-User
+Allow: /
+
+# PerplexityBot
+User-agent: PerplexityBot
+Allow: /
+
+# Cohere AI
+User-agent: cohere-ai
+Allow: /
+
+# Meta AI
+User-agent: FacebookBot
+Allow: /
+
+# Applebot (Siri / Apple Intelligence)
+User-agent: Applebot
+Allow: /
+
+# Sitemap
+Sitemap: https://kuetampah.id/sitemap.xml

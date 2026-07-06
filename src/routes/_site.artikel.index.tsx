@@ -4,19 +4,17 @@ import { CalendarDays, ImageOff } from "lucide-react";
 import { supabase, type Article } from "@/lib/supabase";
 import { SITE_CONFIG } from "@/lib/constants";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { seoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/_site/artikel/")({
-  head: () => ({
-    meta: [
-      { title: `Artikel — ${SITE_CONFIG.name}` },
-      {
-        name: "description",
-        content: `Tips, cerita, dan informasi seputar kue tradisional ${SITE_CONFIG.city}.`,
-      },
-      { property: "og:title", content: `Artikel ${SITE_CONFIG.name}` },
-      { property: "og:description", content: "Edukasi seputar kue tradisional & paket acara." },
-    ],
-  }),
+  head: () => {
+    const { meta, links } = seoMeta({
+      title: "Artikel & Cerita Kue Tradisional",
+      description: `Tips, cerita, dan informasi seputar kue tradisional ${SITE_CONFIG.city}. Inspirasi suguhan acara terbaik.`,
+      path: "/artikel",
+    });
+    return { meta, links };
+  },
   component: ArticlesPage,
 });
 

@@ -16,8 +16,39 @@ import { supabase, type Product, formatRupiah } from "@/lib/supabase";
 import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { seoMeta, productJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const Route = createFileRoute("/_site/produk/$slug")({
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("slug", params.slug)
+      .maybeSingle();
+    return { product: (data as Product | null) ?? null };
+  },
+  head: ({ loaderData }) => {
+    const product = loaderData?.product;
+    if (!product) {
+      return {
+        meta: [{ title: `Produk Tidak Ditemukan — ${SITE_CONFIG.name}` }],
+      };
+    }
+    const images = product.image_url
+      ? product.image_url.split(",").filter(Boolean)
+      : [];
+    const { meta, links } = seoMeta({
+      title: `${product.name} — Kue Tradisional Makassar`,
+      description:
+        product.description??
+        `${product.name} — kue tradisional khas Makassar. Pesan sekarang di ${SITE_CONFIG.name}.`,
+      path: `/produk/${product.slug}`,
+      ogImage: images[0],
+      ogType: "product",
+    });
+    return { meta, links };
+  },
   component: ProductDetail,
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-4 pt-32 pb-20 text-center">
@@ -31,6 +62,7 @@ export const Route = createFileRoute("/_site/produk/$slug")({
 
 function ProductDetail() {
   const { slug } = Route.useParams();
+  const loaderData = Route.useLoaderData();
   const router = useRouter();
   const [qty, setQty] = useState(1);
   const add = useCart((s) => s.add);
@@ -43,6 +75,7 @@ function ProductDetail() {
       const { data } = await supabase.from("products").select("*").eq("slug", slug).maybeSingle();
       return data as Product | null;
     },
+    initialData: loaderData?.product ?? undefined,
   });
 
   if (isLoading) {
@@ -85,6 +118,23 @@ function ProductDetail() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-32 pb-10 md:px-8">
+      {/* Product JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: productJsonLd(product) }}
+      />
+      {/* Breadcrumb JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: breadcrumbJsonLd([
+            { name: "Beranda", path: "/" },
+            { name: "Produk", path: "/produk" },
+            { name: product.name, path: `/produk/${product.slug}` },
+          ]),
+        }}
+      />
+
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
         <Link to="/" className="hover:text-primary">
           Beranda

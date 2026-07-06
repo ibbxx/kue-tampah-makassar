@@ -19,7 +19,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS orders_order_number_idx ON public.orders (orde
 CREATE OR REPLACE FUNCTION public.generate_order_number()
 RETURNS trigger
 LANGUAGE plpgsql
-SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
@@ -64,14 +63,13 @@ ALTER TABLE public.payment_methods ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "payment_methods_select_active" ON public.payment_methods;
 CREATE POLICY "payment_methods_select_active" ON public.payment_methods
-  FOR SELECT USING (is_active OR public.has_role(auth.uid(), 'admin'));
+  FOR SELECT USING (is_active OR private.has_role(auth.uid(), 'admin'));
 
-DROP POLICY IF EXISTS "payment_methods_admin_all" ON public.payment_methods
-;
+DROP POLICY IF EXISTS "payment_methods_admin_all" ON public.payment_methods;
 CREATE POLICY "payment_methods_admin_all" ON public.payment_methods
   FOR ALL
-  USING (public.has_role(auth.uid(), 'admin'))
-  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+  USING (private.has_role(auth.uid(), 'admin'))
+  WITH CHECK (private.has_role(auth.uid(), 'admin'));
 
 -- 4. RLS: Allow customers to view their own order by order_number + phone
 -- =====================================================================
@@ -80,12 +78,51 @@ CREATE POLICY "orders_customer_lookup" ON public.orders
   FOR SELECT
   USING (true);  -- Customers can view by order_number (filtered in app)
 
--- Allow anon update for uploading payment proof
+-- Allow anon update for uploading payment proof (restricted to status = 'pending')
 DROP POLICY IF EXISTS "orders_customer_upload_proof" ON public.orders;
 CREATE POLICY "orders_customer_upload_proof" ON public.orders
   FOR UPDATE
-  USING (true)
-  WITH CHECK (true);
+  USING (status = 'pending')
+  WITH CHECK (status = 'pending');
+
+-- Trigger to verify that non-admin users only update the payment_proof_url field
+CREATE OR REPLACE FUNCTION public.check_order_update()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+BEGIN
+  -- Admin bypass
+  IF auth.uid() IS NOT NULL AND private.has_role(auth.uid(), 'admin') THEN
+    RETURN NEW;
+  END IF;
+
+  -- Customers can only update pending orders
+  IF OLD.status <> 'pending' THEN
+    RAISE EXCEPTION 'Only pending orders can be updated.';
+  END IF;
+
+  -- Verify other fields are not changed
+  IF NEW.customer_name <> OLD.customer_name OR
+     NEW.phone <> OLD.phone OR
+     NEW.address IS DISTINCT FROM OLD.address OR
+     NEW.notes IS DISTINCT FROM OLD.notes OR
+     NEW.total <> OLD.total OR
+     NEW.status <> OLD.status OR
+     NEW.email IS DISTINCT FROM OLD.email OR
+     NEW.order_number IS DISTINCT FROM OLD.order_number THEN
+    RAISE EXCEPTION 'Unauthorized column update. You can only update payment_proof_url.';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_check_order_update ON public.orders;
+CREATE TRIGGER trg_check_order_update
+  BEFORE UPDATE ON public.orders
+  FOR EACH ROW
+  EXECUTE FUNCTION public.check_order_update();
 
 -- 5. Storage bucket for payment proofs
 -- =====================================================================
@@ -98,15 +135,15 @@ DROP POLICY IF EXISTS "payment_proofs_public_insert" ON storage.objects;
 CREATE POLICY "payment_proofs_public_insert" ON storage.objects
   FOR INSERT WITH CHECK (bucket_id = 'payment-proofs');
 
--- Public can read payment proofs
+-- Only admins can read/list payment proofs database records
 DROP POLICY IF EXISTS "payment_proofs_public_read" ON storage.objects;
 CREATE POLICY "payment_proofs_public_read" ON storage.objects
-  FOR SELECT USING (bucket_id = 'payment-proofs');
+  FOR SELECT USING (bucket_id = 'payment-proofs' and (auth.uid() is not null and private.has_role(auth.uid(), 'admin')));
 
 -- Admin can delete payment proofs
 DROP POLICY IF EXISTS "payment_proofs_admin_delete" ON storage.objects;
 CREATE POLICY "payment_proofs_admin_delete" ON storage.objects
-  FOR DELETE USING (bucket_id = 'payment-proofs' AND public.has_role(auth.uid(), 'admin'));
+  FOR DELETE USING (bucket_id = 'payment-proofs' AND private.has_role(auth.uid(), 'admin'));
 
 -- 6. Seed default payment methods (bisa diubah admin)
 -- =====================================================================

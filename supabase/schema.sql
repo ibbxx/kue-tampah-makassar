@@ -104,20 +104,31 @@ create table if not exists public.user_roles (
 );
 
 -- =====================================================================
--- 3. has_role() — SECURITY DEFINER, bypass RLS recursion
+-- 3. private.has_role() — SECURITY DEFINER, bypass RLS recursion
 -- =====================================================================
-create or replace function public.has_role(_user_id uuid, _role public.app_role)
+-- Buat skema private jika belum ada
+create schema if not exists private;
+
+-- Hapus fungsi lama jika ada di public skema
+drop function if exists public.has_role(uuid, text);
+drop function if exists public.has_role(uuid, public.app_role);
+
+create or replace function private.has_role(_user_id uuid, _role public.app_role)
 returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
   select exists (
     select 1 from public.user_roles
     where user_id = _user_id and role = _role
   );
 $$;
+
+-- Berikan hak penggunaan skema dan eksekusi fungsi
+grant usage on schema private to anon, authenticated, service_role;
+grant execute on function private.has_role(uuid, public.app_role) to anon, authenticated, service_role;
 
 -- =====================================================================
 -- 4. RLS
@@ -136,64 +147,72 @@ drop policy if exists "categories_select_all" on public.categories;
 create policy "categories_select_all" on public.categories for select using (true);
 drop policy if exists "categories_admin_all" on public.categories;
 create policy "categories_admin_all" on public.categories for all
-  using (public.has_role(auth.uid(), 'admin'))
-  with check (public.has_role(auth.uid(), 'admin'));
+  using (private.has_role(auth.uid(), 'admin'))
+  with check (private.has_role(auth.uid(), 'admin'));
 
 -- products: public read aktif, admin write
 drop policy if exists "products_select_active" on public.products;
-create policy "products_select_active" on public.products for select using (is_active or public.has_role(auth.uid(), 'admin'));
+create policy "products_select_active" on public.products for select using (is_active or (auth.uid() is not null and private.has_role(auth.uid(), 'admin')));
 drop policy if exists "products_admin_all" on public.products;
 create policy "products_admin_all" on public.products for all
-  using (public.has_role(auth.uid(), 'admin'))
-  with check (public.has_role(auth.uid(), 'admin'));
+  using (private.has_role(auth.uid(), 'admin'))
+  with check (private.has_role(auth.uid(), 'admin'));
 
 -- articles: public read published, admin write
 drop policy if exists "articles_select_published" on public.articles;
-create policy "articles_select_published" on public.articles for select using (published or public.has_role(auth.uid(), 'admin'));
+create policy "articles_select_published" on public.articles for select using (published or (auth.uid() is not null and private.has_role(auth.uid(), 'admin')));
 drop policy if exists "articles_admin_all" on public.articles;
 create policy "articles_admin_all" on public.articles for all
-  using (public.has_role(auth.uid(), 'admin'))
-  with check (public.has_role(auth.uid(), 'admin'));
+  using (private.has_role(auth.uid(), 'admin'))
+  with check (private.has_role(auth.uid(), 'admin'));
 
 -- orders: public INSERT (anonymous checkout), admin SELECT/UPDATE
 drop policy if exists "orders_insert_any" on public.orders;
-create policy "orders_insert_any" on public.orders for insert with check (true);
+create policy "orders_insert_any" on public.orders for insert with check (
+  customer_name is not null and length(trim(customer_name)) > 0 and
+  phone is not null and length(trim(phone)) > 0
+);
 drop policy if exists "orders_admin_select" on public.orders;
-create policy "orders_admin_select" on public.orders for select using (public.has_role(auth.uid(), 'admin'));
+create policy "orders_admin_select" on public.orders for select using (private.has_role(auth.uid(), 'admin'));
 drop policy if exists "orders_admin_update" on public.orders;
-create policy "orders_admin_update" on public.orders for update using (public.has_role(auth.uid(), 'admin'));
+create policy "orders_admin_update" on public.orders for update using (private.has_role(auth.uid(), 'admin'));
 drop policy if exists "orders_admin_delete" on public.orders;
-create policy "orders_admin_delete" on public.orders for delete using (public.has_role(auth.uid(), 'admin'));
+create policy "orders_admin_delete" on public.orders for delete using (private.has_role(auth.uid(), 'admin'));
 
 -- order_items: same pattern
 drop policy if exists "order_items_insert_any" on public.order_items;
-create policy "order_items_insert_any" on public.order_items for insert with check (true);
+create policy "order_items_insert_any" on public.order_items for insert with check (
+  qty > 0 and price >= 0
+);
 drop policy if exists "order_items_admin_select" on public.order_items;
-create policy "order_items_admin_select" on public.order_items for select using (public.has_role(auth.uid(), 'admin'));
+create policy "order_items_admin_select" on public.order_items for select using (private.has_role(auth.uid(), 'admin'));
 
 -- contact_messages: public INSERT, admin read/update
 drop policy if exists "contact_insert_any" on public.contact_messages;
-create policy "contact_insert_any" on public.contact_messages for insert with check (true);
+create policy "contact_insert_any" on public.contact_messages for insert with check (
+  name is not null and length(trim(name)) > 0 and
+  message is not null and length(trim(message)) > 0
+);
 drop policy if exists "contact_admin_all" on public.contact_messages;
 create policy "contact_admin_all" on public.contact_messages for all
-  using (public.has_role(auth.uid(), 'admin'))
-  with check (public.has_role(auth.uid(), 'admin'));
+  using (private.has_role(auth.uid(), 'admin'))
+  with check (private.has_role(auth.uid(), 'admin'));
 
 -- homepage_hero: public read, admin write
 drop policy if exists "homepage_hero_select_active" on public.homepage_hero;
-create policy "homepage_hero_select_active" on public.homepage_hero for select using (is_active or public.has_role(auth.uid(), 'admin'));
+create policy "homepage_hero_select_active" on public.homepage_hero for select using (is_active or (auth.uid() is not null and private.has_role(auth.uid(), 'admin')));
 drop policy if exists "homepage_hero_admin_all" on public.homepage_hero;
 create policy "homepage_hero_admin_all" on public.homepage_hero for all
-  using (public.has_role(auth.uid(), 'admin'))
-  with check (public.has_role(auth.uid(), 'admin'));
+  using (private.has_role(auth.uid(), 'admin'))
+  with check (private.has_role(auth.uid(), 'admin'));
 
 -- user_roles: only admins can manage; users can read their own
 drop policy if exists "user_roles_self_read" on public.user_roles;
-create policy "user_roles_self_read" on public.user_roles for select using (auth.uid() = user_id or public.has_role(auth.uid(), 'admin'));
+create policy "user_roles_self_read" on public.user_roles for select using (auth.uid() = user_id or (auth.uid() is not null and private.has_role(auth.uid(), 'admin')));
 drop policy if exists "user_roles_admin_all" on public.user_roles;
 create policy "user_roles_admin_all" on public.user_roles for all
-  using (public.has_role(auth.uid(), 'admin'))
-  with check (public.has_role(auth.uid(), 'admin'));
+  using (private.has_role(auth.uid(), 'admin'))
+  with check (private.has_role(auth.uid(), 'admin'));
 
 -- =====================================================================
 -- 5. STORAGE BUCKET untuk gambar produk
@@ -204,19 +223,19 @@ on conflict (id) do nothing;
 
 drop policy if exists "product_images_public_read" on storage.objects;
 create policy "product_images_public_read" on storage.objects
-  for select using (bucket_id = 'product-images');
+  for select using (bucket_id = 'product-images' and (auth.uid() is not null and private.has_role(auth.uid(), 'admin')));
 
 drop policy if exists "product_images_admin_write" on storage.objects;
 create policy "product_images_admin_write" on storage.objects
-  for insert with check (bucket_id = 'product-images' and public.has_role(auth.uid(), 'admin'));
+  for insert with check (bucket_id = 'product-images' and private.has_role(auth.uid(), 'admin'));
 
 drop policy if exists "product_images_admin_update" on storage.objects;
 create policy "product_images_admin_update" on storage.objects
-  for update using (bucket_id = 'product-images' and public.has_role(auth.uid(), 'admin'));
+  for update using (bucket_id = 'product-images' and private.has_role(auth.uid(), 'admin'));
 
 drop policy if exists "product_images_admin_delete" on storage.objects;
 create policy "product_images_admin_delete" on storage.objects
-  for delete using (bucket_id = 'product-images' and public.has_role(auth.uid(), 'admin'));
+  for delete using (bucket_id = 'product-images' and private.has_role(auth.uid(), 'admin'));
 
 -- Bucket untuk gambar konten website seperti hero homepage
 insert into storage.buckets (id, name, public)
@@ -225,19 +244,19 @@ on conflict (id) do nothing;
 
 drop policy if exists "site_images_public_read" on storage.objects;
 create policy "site_images_public_read" on storage.objects
-  for select using (bucket_id = 'site-images');
+  for select using (bucket_id = 'site-images' and (auth.uid() is not null and private.has_role(auth.uid(), 'admin')));
 
 drop policy if exists "site_images_admin_write" on storage.objects;
 create policy "site_images_admin_write" on storage.objects
-  for insert with check (bucket_id = 'site-images' and public.has_role(auth.uid(), 'admin'));
+  for insert with check (bucket_id = 'site-images' and private.has_role(auth.uid(), 'admin'));
 
 drop policy if exists "site_images_admin_update" on storage.objects;
 create policy "site_images_admin_update" on storage.objects
-  for update using (bucket_id = 'site-images' and public.has_role(auth.uid(), 'admin'));
+  for update using (bucket_id = 'site-images' and private.has_role(auth.uid(), 'admin'));
 
 drop policy if exists "site_images_admin_delete" on storage.objects;
 create policy "site_images_admin_delete" on storage.objects
-  for delete using (bucket_id = 'site-images' and public.has_role(auth.uid(), 'admin'));
+  for delete using (bucket_id = 'site-images' and private.has_role(auth.uid(), 'admin'));
 
 -- =====================================================================
 -- 6. SEED kategori awal

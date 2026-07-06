@@ -15,19 +15,17 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { useState, useEffect } from "react";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { seoMeta, localBusinessJsonLd, webSiteJsonLd, faqJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/_site/")({
-  head: () => ({
-    meta: [
-      { title: `${SITE_CONFIG.name} — Suguhan Acara Khas Makassar` },
-      {
-        name: "description",
-        content: `Pesan paket kue tampah, jajanan pasar Makassar, kue dos & suguhan acara di ${SITE_CONFIG.addressShort}. Halal, fresh, custom isi.`,
-      },
-      { property: "og:title", content: SITE_CONFIG.name },
-      { property: "og:description", content: SITE_CONFIG.description },
-    ],
-  }),
+  head: () => {
+    const { meta, links } = seoMeta({
+      title: "Kue Tampah & Jajanan Pasar Khas Makassar",
+      description: `Pesan paket kue tampah, jajanan pasar Makassar, kue dos & suguhan acara di ${SITE_CONFIG.addressShort}. Halal, fresh, custom isi. Pesan sekarang!`,
+      path: "/",
+    });
+    return { meta, links };
+  },
   component: HomePage,
 });
 
@@ -142,6 +140,20 @@ function HomePage() {
 
   return (
     <div>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: localBusinessJsonLd() }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: webSiteJsonLd() }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqJsonLd(faqs) }}
+      />
+
       {/* HERO */}
       <section className="relative flex min-h-[90vh] items-center overflow-hidden md:min-h-screen">
         {/* Fullscreen Image Background */}

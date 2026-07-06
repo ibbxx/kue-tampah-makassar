@@ -3,19 +3,49 @@ import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, ChevronRight } from "lucide-react";
 import { supabase, type Article } from "@/lib/supabase";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { seoMeta, articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const Route = createFileRoute("/_site/artikel/$slug")({
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("articles")
+      .select("*")
+      .eq("slug", params.slug)
+      .maybeSingle();
+    return { article: (data as Article | null) ?? null };
+  },
+  head: ({ loaderData }) => {
+    const article = loaderData?.article;
+    if (!article) {
+      return {
+        meta: [{ title: `Artikel Tidak Ditemukan — ${SITE_CONFIG.name}` }],
+      };
+    }
+    const { meta, links } = seoMeta({
+      title: article.title,
+      description:
+        article.excerpt ??
+        `Baca artikel "${article.title}" di ${SITE_CONFIG.name}.`,
+      path: `/artikel/${article.slug}`,
+      ogImage: article.cover_url ?? undefined,
+      ogType: "article",
+    });
+    return { meta, links };
+  },
   component: ArticleDetail,
 });
 
 function ArticleDetail() {
   const { slug } = Route.useParams();
+  const loaderData = Route.useLoaderData();
   const { data: article, isLoading } = useQuery({
     queryKey: ["article", slug],
     queryFn: async () => {
       const { data } = await supabase.from("articles").select("*").eq("slug", slug).maybeSingle();
       return data as Article | null;
     },
+    initialData: loaderData?.article ?? undefined,
   });
 
   if (isLoading)
@@ -33,6 +63,23 @@ function ArticleDetail() {
 
   return (
     <article className="mx-auto max-w-3xl px-4 pt-32 pb-12 md:px-8">
+      {/* Article JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: articleJsonLd(article) }}
+      />
+      {/* Breadcrumb JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: breadcrumbJsonLd([
+            { name: "Beranda", path: "/" },
+            { name: "Artikel", path: "/artikel" },
+            { name: article.title, path: `/artikel/${article.slug}` },
+          ]),
+        }}
+      />
+
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
         <Link to="/" className="hover:text-primary">
           Beranda

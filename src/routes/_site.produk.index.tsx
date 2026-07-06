@@ -6,6 +6,7 @@ import { z } from "zod";
 import { supabase, type Product, type Category } from "@/lib/supabase";
 import { ProductCard } from "@/components/site/ProductCard";
 import { SITE_CONFIG } from "@/lib/constants";
+import { seoMeta } from "@/lib/seo";
 
 const search = z.object({
   q: z.string().optional(),
@@ -14,17 +15,14 @@ const search = z.object({
 
 export const Route = createFileRoute("/_site/produk/")({
   validateSearch: search,
-  head: () => ({
-    meta: [
-      { title: `Produk — ${SITE_CONFIG.name}` },
-      {
-        name: "description",
-        content: `Katalog lengkap kue tampah, jajanan pasar, dan suguhan acara khas ${SITE_CONFIG.city}.`,
-      },
-      { property: "og:title", content: "Produk Kue Tampah" },
-      { property: "og:description", content: "Pilih kue tampah favorit Anda." },
-    ],
-  }),
+  head: () => {
+    const { meta, links } = seoMeta({
+      title: "Produk Kue Tampah & Jajanan Pasar",
+      description: `Katalog lengkap kue tampah, jajanan pasar, dan suguhan acara khas ${SITE_CONFIG.city}. Pilih favorit Anda dan pesan sekarang!`,
+      path: "/produk",
+    });
+    return { meta, links };
+  },
   component: ProductsPage,
 });
 

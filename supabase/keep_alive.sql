@@ -14,11 +14,14 @@
 -- ============================================================
 
 create or replace function ping_db()
-returns json as $$
+returns json
+language plpgsql
+set search_path = public
+as $$
 begin
   return json_build_object(
     'status', 'ok',
     'timestamp', now()
   );
 end;
-$$ language plpgsql;
+$$;
