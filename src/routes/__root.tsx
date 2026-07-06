@@ -78,6 +78,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       meta: [
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "google-site-verification",
+          content: "MrYkDTkvpHhhYL-VywdNTG6hIPoqTUL3uYgow-xCbrY",
+        },
         { title: `${SITE_CONFIG.name} — Kue Tradisional Khas Makassar` },
         { name: "description", content: SITE_CONFIG.description },
         { name: "author", content: SITE_CONFIG.name },
