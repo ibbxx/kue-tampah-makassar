@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, X, Package, Boxes, FolderTree } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Package, Boxes, FolderTree, Search } from "lucide-react";
 import { useState } from "react";
 import { supabase, deleteFromStorage, formatRupiah, type Product, type Category } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -28,6 +28,10 @@ function ProductAdmin() {
   const [sessionUploads, setSessionUploads] = useState<string[]>([]);
   const [sessionCategoryUploads, setSessionCategoryUploads] = useState<string[]>([]);
 
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const { data: products } = useQuery({
     queryKey: ["admin", "products"],
     queryFn: async () => {
@@ -41,6 +45,16 @@ function ProductAdmin() {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => ((await supabase.from("categories").select("*")).data as Category[]) ?? [],
+  });
+
+  const filteredProducts = (products ?? []).filter((p) => {
+    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
+                          (p.slug && p.slug.toLowerCase().includes(search.toLowerCase()));
+    const matchesCategory = !categoryFilter || p.category_id === categoryFilter;
+    const matchesStatus = statusFilter === "all" || 
+                          (statusFilter === "active" && p.is_active) || 
+                          (statusFilter === "inactive" && !p.is_active);
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
   const save = async () => {
@@ -262,7 +276,8 @@ function ProductAdmin() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-3xl font-bold">Atur Produk</h1>
           <p className="text-sm text-muted-foreground">Kelola katalog kue tampah Anda.</p>
@@ -270,73 +285,233 @@ function ProductAdmin() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowCategories(true)}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
           >
             <FolderTree className="h-4 w-4" /> Kelola Kategori
           </button>
           <button
             onClick={() => setEditing({ is_active: true, stock: 0, price: 0 })}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity cursor-pointer"
           >
             <Plus className="h-4 w-4" /> Tambah Produk
           </button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      {/* Stats Summary Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm flex items-center gap-4">
+          <div className="rounded-xl bg-primary/10 p-3 text-primary">
+            <Package className="h-6 w-6" />
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground font-medium">Total Produk</div>
+            <div className="text-2xl font-bold font-display mt-0.5">{products?.length ?? 0}</div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm flex items-center gap-4">
+          <div className="rounded-xl bg-amber-500/10 p-3 text-amber-600">
+            <Boxes className="h-6 w-6" />
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground font-medium">Stok Menipis (&lt; 10)</div>
+            <div className="text-2xl font-bold font-display mt-0.5 text-amber-600">
+              {products?.filter((p) => (p.stock ?? 0) < 10).length ?? 0}
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm flex items-center gap-4">
+          <div className="rounded-xl bg-emerald-500/10 p-3 text-emerald-600">
+            <FolderTree className="h-6 w-6" />
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground font-medium">Kategori</div>
+            <div className="text-2xl font-bold font-display mt-0.5">{categories?.length ?? 0}</div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm flex items-center gap-4">
+          <div className="rounded-xl bg-accent/10 p-3 text-accent relative">
+            <span className="absolute top-2 right-2 flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+            </span>
+            <Package className="h-6 w-6" />
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground font-medium">Produk Aktif</div>
+            <div className="text-2xl font-bold font-display mt-0.5 text-accent">
+              {products?.filter((p) => p.is_active).length ?? 0}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-card border border-border p-4 rounded-2xl shadow-sm">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Cari nama atau slug produk..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-full border border-border bg-background pl-10 pr-4 py-2 text-sm outline-none transition-all hover:border-border/80 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="rounded-full border border-border bg-background px-4 py-2 text-sm outline-none transition-all hover:border-border/80 focus:border-primary shadow-sm cursor-pointer"
+          >
+            <option value="">Semua Kategori</option>
+            {(categories ?? []).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="rounded-full border border-border bg-background px-4 py-2 text-sm outline-none transition-all hover:border-border/80 focus:border-primary shadow-sm cursor-pointer"
+          >
+            <option value="all">Semua Status</option>
+            <option value="active">Aktif</option>
+            <option value="inactive">Nonaktif</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Product Table */}
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
+          <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground border-b border-border">
             <tr>
-              <th className="px-4 py-3">Nama</th>
-              <th className="px-4 py-3">Harga</th>
-              <th className="px-4 py-3">Stok</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3"></th>
+              <th className="px-4 py-4 font-semibold">Produk</th>
+              <th className="px-4 py-4 font-semibold">Harga</th>
+              <th className="px-4 py-4 font-semibold">Stok</th>
+              <th className="px-4 py-4 font-semibold">Status</th>
+              <th className="px-4 py-4 font-semibold">Kategori</th>
+              <th className="px-4 py-4"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {(products ?? []).map((p) => (
-              <tr key={p.id}>
-                <td className="px-4 py-3">
-                  <div className="font-semibold">{p.name}</div>
-                  <div className="text-xs text-muted-foreground">/{p.slug}</div>
-                </td>
-                <td className="px-4 py-3">{formatRupiah(Number(p.price))}</td>
-                <td className="px-4 py-3">{p.stock}</td>
-                <td className="px-4 py-3">
-                  {p.is_active ? (
-                    <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent">
-                      Aktif
+            {filteredProducts.map((p) => {
+              const imageUrl = p.image_url ? p.image_url.split(",")[0] : null;
+              const categoryName = categories?.find((c) => c.id === p.category_id)?.name || "Tanpa Kategori";
+              
+              let stockBadge = (
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600">
+                  {p.stock} pcs
+                </span>
+              );
+              if (p.stock === 0) {
+                stockBadge = (
+                  <span className="rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive">
+                    Habis
+                  </span>
+                );
+              } else if (p.stock < 10) {
+                stockBadge = (
+                  <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-600">
+                    Sisa {p.stock} pcs
+                  </span>
+                );
+              }
+
+              return (
+                <tr key={p.id} className="hover:bg-muted/20 transition-colors group border-b border-border">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={p.name}
+                          className="h-12 w-12 rounded-lg object-cover shadow-sm border border-border transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted border border-border text-muted-foreground">
+                          <Package className="h-5 w-5" />
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-semibold text-foreground flex items-center gap-1.5 flex-wrap">
+                          {p.name}
+                          {p.is_featured && (
+                            <span className="inline-flex items-center gap-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                              ★ Unggulan
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">/{p.slug}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 font-medium text-foreground">
+                    {formatRupiah(Number(p.price))}
+                  </td>
+                  <td className="px-4 py-4">
+                    {stockBadge}
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {p.is_active ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                          Aktif
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60"></span>
+                          Nonaktif
+                        </span>
+                      )}
+                      {p.is_featured && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                          ★ Unggulan
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                      {categoryName}
                     </span>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">Nonaktif</span>
-                  )}
-                  {p.is_featured && (
-                    <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                      Unggulan
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => setEditing(p)}
-                    className="mr-1 rounded-md p-1.5 hover:bg-muted"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => remove(p.id)}
-                    className="rounded-md p-1.5 text-destructive hover:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {(!products || products.length === 0) && (
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        onClick={() => setEditing(p)}
+                        className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+                        title="Edit Produk"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => remove(p.id)}
+                        className="rounded-full p-2 text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                        title="Hapus Produk"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+            {filteredProducts.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
-                  Belum ada produk.
+                <td colSpan={6} className="px-4 py-16 text-center text-muted-foreground">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Package className="h-10 w-10 opacity-30" />
+                    <span>Tidak ada produk ditemukan.</span>
+                  </div>
                 </td>
               </tr>
             )}
@@ -344,6 +519,7 @@ function ProductAdmin() {
         </table>
       </div>
 
+      {/* MODAL EDIT / TAMBAH PRODUK */}
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
           <div
@@ -363,7 +539,7 @@ function ProductAdmin() {
               </div>
               <button
                 onClick={handleCancel}
-                className="rounded-full p-2 hover:bg-muted text-muted-foreground transition-colors"
+                className="rounded-full p-2 hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -372,17 +548,17 @@ function ProductAdmin() {
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid gap-8 md:grid-cols-3">
-                {/* Left Column: Image Preview & Visibility */}
+                {/* Left Column: Media & Visibility */}
                 <div className="space-y-6 md:col-span-1">
                   <div>
                     <h3 className="mb-3 text-sm font-semibold text-foreground flex items-center justify-between">
                       Media Produk
                       <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                        Bisa lebih dari 1
+                        Bisa &gt; 1
                       </span>
                     </h3>
 
-                    {/* Daftar Gambar (Grid) */}
+                    {/* Image Grid */}
                     {(editing.image_url ? editing.image_url.split(",").filter(Boolean) : [])
                       .length > 0 && (
                       <div className="grid grid-cols-3 gap-2 mb-3">
@@ -403,7 +579,7 @@ function ProductAdmin() {
                               <button
                                 type="button"
                                 onClick={() => removeImage(i)}
-                                className="rounded-full bg-destructive p-1.5 text-destructive-foreground shadow-sm hover:scale-110 transition-transform"
+                                className="rounded-full bg-destructive p-1.5 text-destructive-foreground shadow-sm hover:scale-110 transition-transform cursor-pointer"
                               >
                                 <Trash2 className="h-3 w-3" />
                               </button>
@@ -413,7 +589,7 @@ function ProductAdmin() {
                       </div>
                     )}
 
-                    {/* Tombol Upload */}
+                    {/* Upload Dropzone */}
                     <div
                       className={cn(
                         "group relative flex aspect-video cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-all",
@@ -442,11 +618,11 @@ function ProductAdmin() {
                           <span className="mt-2 text-[10px] font-medium">Mengunggah...</span>
                         </div>
                       ) : (
-                        <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-muted-foreground transition-colors hover:text-primary p-4">
-                          <UploadCloud className="mb-2 h-8 w-8 opacity-50" />
-                          <span className="text-sm font-medium">Klik atau Drag & Drop</span>
-                          <span className="mt-1 text-[10px] text-center">
-                            PNG, JPG up to 10MB (Auto Compress)
+                        <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-muted-foreground transition-colors hover:text-primary p-4 text-center">
+                          <UploadCloud className="mb-2 h-8 w-8 opacity-50 group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-semibold">Klik atau Drag & Drop</span>
+                          <span className="mt-0.5 text-[9px] opacity-70">
+                            PNG, JPG up to 10MB
                           </span>
                           <input
                             type="file"
@@ -458,69 +634,42 @@ function ProductAdmin() {
                       )}
                     </div>
 
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <Field
-                        label="URL Gambar (Pisahkan dengan koma jika lebih dari 1)"
+                        label="Atau masukkan URL Gambar manual"
                         value={editing.image_url ?? ""}
                         onChange={(v) => setEditing({ ...editing, image_url: v })}
-                        placeholder="https://url1.jpg,https://url2.jpg"
+                        placeholder="https://..."
                       />
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-                    <h3 className="mb-4 text-sm font-semibold text-foreground">
-                      Pengaturan Visibilitas
+                  {/* Visibility settings */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Pengaturan Status
                     </h3>
-                    <div className="space-y-4">
-                      <label className="flex cursor-pointer items-start gap-3">
-                        <div className="flex h-5 items-center">
-                          <input
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                            checked={!!editing.is_active}
-                            onChange={(e) =>
-                              setEditing({ ...editing, is_active: e.target.checked })
-                            }
-                          />
-                        </div>
-                        <div>
-                          <span className="block text-sm font-medium text-foreground">
-                            Tampil di Toko
-                          </span>
-                          <span className="block text-xs text-muted-foreground mt-0.5">
-                            Produk dapat dibeli oleh pelanggan
-                          </span>
-                        </div>
-                      </label>
-                      <label className="flex cursor-pointer items-start gap-3">
-                        <div className="flex h-5 items-center">
-                          <input
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                            checked={!!editing.is_featured}
-                            onChange={(e) =>
-                              setEditing({ ...editing, is_featured: e.target.checked })
-                            }
-                          />
-                        </div>
-                        <div>
-                          <span className="block text-sm font-medium text-foreground">
-                            Produk Unggulan
-                          </span>
-                          <span className="block text-xs text-muted-foreground mt-0.5">
-                            Tampil lebih awal di halaman utama
-                          </span>
-                        </div>
-                      </label>
+                    <div className="flex flex-col gap-3">
+                      <ToggleSwitch
+                        label="Tampil di Toko"
+                        description="Produk aktif & dapat dibeli pelanggan"
+                        checked={!!editing.is_active}
+                        onChange={(val) => setEditing({ ...editing, is_active: val })}
+                      />
+                      <ToggleSwitch
+                        label="Produk Unggulan"
+                        description="Ditampilkan prioritas di homepage"
+                        checked={!!editing.is_featured}
+                        onChange={(val) => setEditing({ ...editing, is_featured: val })}
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* Right Column: Details */}
-                <div className="space-y-8 md:col-span-2">
+                {/* Right Column: Text Details */}
+                <div className="space-y-6 md:col-span-2">
                   <div className="space-y-4">
-                    <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
                       <Package className="h-4 w-4 text-primary" /> Informasi Dasar
                     </h3>
                     <Field
@@ -529,21 +678,21 @@ function ProductAdmin() {
                       onChange={(v) =>
                         setEditing({ ...editing, name: v, slug: editing.slug || slugify(v) })
                       }
-                      placeholder="Contoh: Tampah Spesial 50 Pcs"
+                      placeholder="Contoh: Tampah Premium 50 Kue"
                     />
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Field
-                        label="Slug (URL Otomatis)"
+                        label="Slug (Link Otomatis)"
                         value={editing.slug ?? ""}
                         onChange={(v) => setEditing({ ...editing, slug: v })}
-                        placeholder="tampah-spesial"
+                        placeholder="tampah-premium"
                       />
                       <Field
                         label="Badge Label (Opsional)"
                         value={editing.badge ?? ""}
                         onChange={(v) => setEditing({ ...editing, badge: v })}
-                        placeholder="Contoh: Best Seller, Baru"
+                        placeholder="Contoh: Terlaris, Spesial"
                       />
                     </div>
 
@@ -552,12 +701,12 @@ function ProductAdmin() {
                       value={editing.description ?? ""}
                       onChange={(v) => setEditing({ ...editing, description: v })}
                       textarea
-                      placeholder="Jelaskan isi detail, keunggulan, dan ukuran produk ini..."
+                      placeholder="Jelaskan detail kue, porsi, isi, diameter tampah..."
                     />
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
                       <Boxes className="h-4 w-4 text-primary" /> Harga & Organisasi
                     </h3>
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -584,9 +733,9 @@ function ProductAdmin() {
                         onChange={(e) =>
                           setEditing({ ...editing, category_id: e.target.value || null })
                         }
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-all hover:border-border/80 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
+                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-all hover:border-border/80 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm cursor-pointer"
                       >
-                        <option value="">— Tidak ada kategori —</option>
+                        <option value="">— Tanpa Kategori —</option>
                         {(categories ?? []).map((c) => (
                           <option key={c.id} value={c.id}>
                             {c.name}
@@ -603,13 +752,13 @@ function ProductAdmin() {
             <div className="flex items-center justify-end gap-3 border-t border-border bg-muted/30 px-6 py-4 rounded-b-2xl">
               <button
                 onClick={handleCancel}
-                className="rounded-full px-5 py-2.5 text-sm font-medium hover:bg-muted transition-colors"
+                className="rounded-full border border-border px-5 py-2.5 text-sm font-medium hover:bg-muted transition-colors cursor-pointer"
               >
                 Batal
               </button>
               <button
                 onClick={save}
-                className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow hover:opacity-90 transition-opacity"
+                className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow hover:opacity-90 transition-opacity cursor-pointer"
               >
                 {editing.id ? "Simpan Perubahan" : "Simpan Produk Baru"}
               </button>
@@ -630,12 +779,12 @@ function ProductAdmin() {
               <div>
                 <h2 className="font-display text-xl font-bold">Kelola Kategori</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Kelompokkan produk Anda agar mudah dicari oleh pelanggan.
+                  Kelompokkan produk agar lebih mudah ditelusuri pembeli.
                 </p>
               </div>
               <button
                 onClick={handleCloseCategories}
-                className="rounded-full p-2 hover:bg-muted text-muted-foreground transition-colors"
+                className="rounded-full p-2 hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -647,9 +796,9 @@ function ProductAdmin() {
                   <div className="mb-4 flex justify-end">
                     <button
                       onClick={() => setEditingCategory({})}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors cursor-pointer"
                     >
-                      <Plus className="h-3 w-3" /> Tambah Kategori
+                      <Plus className="h-3.5 w-3.5" /> Tambah Kategori
                     </button>
                   </div>
                   <div className="overflow-hidden rounded-xl border border-border shadow-sm">
@@ -664,18 +813,18 @@ function ProductAdmin() {
                       <tbody className="divide-y divide-border">
                         {(categories ?? []).map((c) => (
                           <tr key={c.id}>
-                            <td className="px-4 py-3 font-medium">{c.name}</td>
+                            <td className="px-4 py-3 font-semibold text-foreground">{c.name}</td>
                             <td className="px-4 py-3 text-muted-foreground">/{c.slug}</td>
                             <td className="px-4 py-3 text-right">
                               <button
                                 onClick={() => setEditingCategory(c)}
-                                className="mr-1 rounded-md p-1.5 hover:bg-muted transition-colors"
+                                className="mr-1 rounded-full p-2 hover:bg-muted transition-colors cursor-pointer"
                               >
-                                <Pencil className="h-4 w-4" />
+                                <Pencil className="h-4 w-4 text-muted-foreground" />
                               </button>
                               <button
                                 onClick={() => removeCategory(c.id)}
-                                className="rounded-md p-1.5 text-destructive hover:bg-destructive/10 transition-colors"
+                                className="rounded-full p-2 text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -695,7 +844,7 @@ function ProductAdmin() {
                 </>
               ) : (
                 <div className="rounded-xl border border-border p-5 bg-card shadow-sm animate-in fade-in zoom-in-95 duration-200">
-                  <h3 className="mb-4 text-sm font-semibold">
+                  <h3 className="mb-4 text-sm font-semibold text-foreground border-b border-border pb-2">
                     {editingCategory.id ? "Edit Kategori" : "Tambah Kategori Baru"}
                   </h3>
                   <div className="space-y-4">
@@ -712,7 +861,7 @@ function ProductAdmin() {
                       placeholder="Contoh: Tampah Premium"
                     />
                     <Field
-                      label="Slug (URL Otomatis)"
+                      label="Slug (Link Otomatis)"
                       value={editingCategory.slug ?? ""}
                       onChange={(v) => setEditingCategory({ ...editingCategory, slug: v })}
                       placeholder="tampah-premium"
@@ -722,11 +871,11 @@ function ProductAdmin() {
                       value={editingCategory.description ?? ""}
                       onChange={(v) => setEditingCategory({ ...editingCategory, description: v })}
                       textarea
-                      placeholder="Aneka tampah ukuran besar..."
+                      placeholder="Aneka kue tampah premium ukuran besar..."
                     />
 
                     <div>
-                      <span className="text-xs font-medium text-muted-foreground mb-1 block">
+                      <span className="text-xs font-medium text-muted-foreground mb-2 block">
                         Gambar Kategori (Opsional)
                       </span>
                       <div className="flex items-center gap-4">
@@ -734,10 +883,10 @@ function ProductAdmin() {
                           <img
                             src={editingCategory.image_url}
                             alt="Kategori"
-                            className="h-16 w-16 object-cover rounded-md border border-border"
+                            className="h-16 w-16 object-cover rounded-lg border border-border shadow-sm"
                           />
                         )}
-                        <label className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors">
+                        <label className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium hover:bg-muted transition-colors">
                           {uploading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
@@ -755,7 +904,7 @@ function ProductAdmin() {
                           />
                         </label>
                       </div>
-                      <div className="mt-2">
+                      <div className="mt-3">
                         <Field
                           label="Atau URL Gambar"
                           value={editingCategory.image_url ?? ""}
@@ -765,16 +914,16 @@ function ProductAdmin() {
                       </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-2">
+                    <div className="flex justify-end gap-2 pt-2 border-t border-border mt-4">
                       <button
                         onClick={handleCategoryCancel}
-                        className="rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-muted transition-colors"
+                        className="rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-muted transition-colors cursor-pointer"
                       >
                         Batal
                       </button>
                       <button
                         onClick={saveCategory}
-                        className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow hover:opacity-90 transition-opacity"
+                        className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow hover:opacity-90 transition-opacity cursor-pointer"
                       >
                         Simpan Kategori
                       </button>
@@ -787,6 +936,42 @@ function ProductAdmin() {
         </div>
       )}
     </div>
+  );
+}
+
+function ToggleSwitch({
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description?: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:bg-muted/50">
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold text-foreground">{label}</span>
+        {description && <span className="text-xs text-muted-foreground mt-0.5">{description}</span>}
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange(!checked)}
+        className={cn(
+          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+          checked ? "bg-primary" : "bg-muted"
+        )}
+      >
+        <span
+          className={cn(
+            "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow ring-0 transition duration-200 ease-in-out",
+            checked ? "translate-x-5" : "translate-x-0"
+          )}
+        />
+      </button>
+    </label>
   );
 }
 

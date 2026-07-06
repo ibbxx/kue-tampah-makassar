@@ -17,7 +17,7 @@ function AdminTentang() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, isError } = useQuery({
     queryKey: ["admin", "site-settings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -28,6 +28,7 @@ function AdminTentang() {
       if (error) throw error;
       return data as SiteSettings | null;
     },
+    retry: false,
   });
 
   useEffect(() => {
@@ -105,6 +106,56 @@ function AdminTentang() {
       setSaving(false);
     }
   };
+
+  if (isError) {
+    const isTableMissing = error instanceof Error && error.message.includes("public.site_settings");
+    return (
+      <div className="space-y-6 max-w-2xl">
+        <div>
+          <h1 className="font-display text-3xl font-bold">Halaman Tentang Kami</h1>
+          <p className="text-sm text-muted-foreground">
+            Kelola konten halaman Tentang Kami.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-destructive">
+          <h3 className="font-semibold text-lg mb-2">Gagal Memuat Pengaturan</h3>
+          {isTableMissing ? (
+            <div className="space-y-4">
+              <p className="text-sm text-destructive/90">
+                Tabel <code>site_settings</code> belum dibuat di database Supabase Anda. 
+                Silakan jalankan perintah SQL berikut di SQL Editor Supabase Anda untuk membuatnya:
+              </p>
+              <div className="rounded-lg bg-zinc-950 p-4 font-mono text-xs text-zinc-200 overflow-auto border border-zinc-800">
+                <pre className="whitespace-pre-wrap">{`create table if not exists public.site_settings (
+  id text primary key default 'global',
+  about_image_url text,
+  updated_at timestamptz default now(),
+  constraint site_settings_singleton check (id = 'global')
+);
+
+alter table public.site_settings enable row level security;
+
+drop policy if exists "site_settings_public_read" on public.site_settings;
+create policy "site_settings_public_read" on public.site_settings for select using (true);
+
+drop policy if exists "site_settings_admin_all" on public.site_settings;
+create policy "site_settings_admin_all" on public.site_settings for all
+  using (private.has_role(auth.uid(), 'admin'))
+  with check (private.has_role(auth.uid(), 'admin'));
+
+insert into public.site_settings (id, about_image_url) 
+values ('global', 'https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=1200&q=80') 
+on conflict (id) do nothing;`}</pre>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm">{(error as any)?.message || "Terjadi kesalahan koneksi database."}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-2xl">
