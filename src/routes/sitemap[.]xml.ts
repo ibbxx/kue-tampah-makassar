@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 
-const SITE_URL = "https://kuetampah.id";
+const SITE_URL = "https://kuetampah.com";
+
+type SitemapPage = {
+  loc: string;
+  changefreq: "daily" | "weekly" | "monthly";
+  priority: string;
+  lastmod?: string;
+};
 
 /**
  * Dynamic sitemap.xml route.
@@ -22,7 +29,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const supabase = createClient(url, key);
 
         // Static pages
-        const staticPages = [
+        const staticPages: SitemapPage[] = [
           { loc: "/", changefreq: "daily", priority: "1.0" },
           { loc: "/produk", changefreq: "daily", priority: "0.9" },
           { loc: "/artikel", changefreq: "weekly", priority: "0.8" },
@@ -36,9 +43,9 @@ export const Route = createFileRoute("/sitemap.xml")({
           .select("slug, created_at")
           .eq("is_active", true);
 
-        const productPages = (products ?? []).map((p) => ({
+        const productPages: SitemapPage[] = (products ?? []).map((p) => ({
           loc: `/produk/${p.slug}`,
-          changefreq: "weekly" as const,
+          changefreq: "weekly",
           priority: "0.8",
           lastmod: p.created_at
             ? new Date(p.created_at).toISOString().split("T")[0]
@@ -51,16 +58,16 @@ export const Route = createFileRoute("/sitemap.xml")({
           .select("slug, created_at")
           .eq("published", true);
 
-        const articlePages = (articles ?? []).map((a) => ({
+        const articlePages: SitemapPage[] = (articles ?? []).map((a) => ({
           loc: `/artikel/${a.slug}`,
-          changefreq: "monthly" as const,
+          changefreq: "monthly",
           priority: "0.7",
           lastmod: a.created_at
             ? new Date(a.created_at).toISOString().split("T")[0]
             : undefined,
         }));
 
-        const allPages = [...staticPages, ...productPages, ...articlePages];
+        const allPages: SitemapPage[] = [...staticPages, ...productPages, ...articlePages];
 
         const urls = allPages
           .map(

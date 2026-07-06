@@ -2,7 +2,7 @@ export const SITE_CONFIG = {
   name: "Kue Tampah Ratulangi",
   shortName: "Kue Tampah",
   branch: "Ratulangi",
-  url: "https://kuetampah.id",
+  url: "https://kuetampah.com",
   city: "Makassar",
   tagline: "Kue Tradisional, Rasa Istimewa",
   description:

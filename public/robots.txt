@@ -45,4 +45,4 @@ User-agent: Applebot
 Allow: /
 
 # Sitemap
-Sitemap: https://kuetampah.id/sitemap.xml
+Sitemap: https://kuetampah.com/sitemap.xml
