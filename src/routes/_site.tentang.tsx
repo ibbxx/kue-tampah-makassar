@@ -57,12 +57,12 @@ function AboutPage() {
 
       <div className="prose prose-neutral mt-10 max-w-none text-foreground/80">
         <h2 className="font-display text-2xl font-bold text-primary">Latar Belakang</h2>
-        <p>
+        <p className="text-justify">
           Terinspirasi dari budaya “Tudang Sipulung” masyarakat Bugis-Makassar yang gemar berkumpul bersama, 
           PT. Berkah Bersama Gemilang melahirkan brand Kue Tampah pada Maret 2024. Brand ini hadir untuk 
           memeriahkan suasana berkumpul yang disesuaikan dengan kebutuhan acara-acara di masa modern.
         </p>
-        <p>
+        <p className="text-justify">
           Meningkatnya perbedaan selera dari setiap orang yang berkumpul mendorong Kue Tampah untuk mengkreasikan 
           lebih dari 40 varian kue bercita rasa asin dan manis guna memenuhi beragam kebutuhan tersebut. 
           Kini, kami hadir di dua titik strategis Kota Makassar — Jl. Dr. Ratulangi No. 82 B dan 
