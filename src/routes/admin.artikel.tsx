@@ -275,7 +275,7 @@ function ArticleAdmin() {
                 />
               </div>
               <Input
-                label="Excerpt"
+                label="Caption"
                 value={editing.excerpt ?? ""}
                 onChange={(v) => setEditing({ ...editing, excerpt: v })}
                 textarea

@@ -20,8 +20,8 @@ import { seoMeta, localBusinessJsonLd, webSiteJsonLd, faqJsonLd } from "@/lib/se
 export const Route = createFileRoute("/_site/")({
   head: () => {
     const { meta, links } = seoMeta({
-      title: "Kue Tampah & Jajanan Pasar Khas Makassar",
-      description: `Pesan paket kue tampah, jajanan pasar Makassar, kue dos & suguhan acara di ${SITE_CONFIG.addressShort}. Halal, fresh, custom isi. Pesan sekarang!`,
+      title: "Toko Kue Tradisional & Kue Tampah Makassar",
+      description: `Toko kue tradisional terbaik di Makassar. Pesan aneka kue tampah makassar, jajanan pasar, dan suguhan acara di ${SITE_CONFIG.addressShort}. Halal, fresh, custom isi.`,
       path: "/",
     });
     return { meta, links };

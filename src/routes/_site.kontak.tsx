@@ -28,7 +28,7 @@ const schema = z.object({
 function ContactPage() {
   const [form, setForm] = useState({ name: "", phone: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<"ratulangi" | "perintis">("ratulangi");
+  const [selectedBranch, setSelectedBranch] = useState<"ratulangi" | "perintis">("perintis");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

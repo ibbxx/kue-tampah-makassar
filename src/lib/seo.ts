@@ -9,6 +9,7 @@ type SeoOptions = {
   title: string;
   description: string;
   path: string;
+  keywords?: string;
   ogImage?: string;
   ogType?: "website" | "article" | "product";
   noIndex?: boolean;
@@ -28,6 +29,7 @@ export function seoMeta(opts: SeoOptions) {
     { name: "viewport", content: "width=device-width, initial-scale=1" },
     { title: fullTitle },
     { name: "description", content: opts.description },
+    { name: "keywords", content: opts.keywords ?? SITE_CONFIG.keywords },
     { name: "author", content: SITE_CONFIG.name },
 
     // Robots

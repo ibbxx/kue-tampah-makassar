@@ -58,15 +58,15 @@ function AboutPage() {
       <div className="prose prose-neutral mt-10 max-w-none text-foreground/80">
         <h2 className="font-display text-2xl font-bold text-primary">Latar Belakang</h2>
         <p className="text-justify">
-          Terinspirasi dari budaya “Tudang Sipulung” masyarakat Bugis-Makassar yang gemar berkumpul bersama, 
-          PT. Berkah Bersama Gemilang melahirkan brand Kue Tampah pada Maret 2024. Brand ini hadir untuk 
+          Terinspirasi dari budaya “Tudang Sipulung” masyarakat Bugis-Makassar yang gemar berkumpul bersama,
+          PT. Berkah Bersama Gemilang melahirkan brand Kue Tampah pada Maret 2024. Brand ini hadir untuk
           memeriahkan suasana berkumpul yang disesuaikan dengan kebutuhan acara-acara di masa modern.
         </p>
         <p className="text-justify">
-          Meningkatnya perbedaan selera dari setiap orang yang berkumpul mendorong Kue Tampah untuk mengkreasikan 
-          lebih dari 40 varian kue bercita rasa asin dan manis guna memenuhi beragam kebutuhan tersebut. 
-          Kini, kami hadir di dua titik strategis Kota Makassar — Jl. Dr. Ratulangi No. 82 B dan 
-          Jl. Perintis Kemerdekaan Km. 12 — siap menjadi penyedia suguhan ringan nomor 1 pilihan Teman Tampah 
+          Meningkatnya perbedaan selera dari setiap orang yang berkumpul mendorong Kue Tampah untuk mengkreasikan
+          lebih dari 40 varian kue bercita rasa asin dan manis guna memenuhi beragam kebutuhan tersebut.
+          Kini, kami hadir di dua titik strategis Kota Makassar — Jl. Dr. Ratulangi No. 82 B dan
+          Jl. Perintis Kemerdekaan Km. 12 — siap menjadi penyedia suguhan ringan nomor 1 pilihan Teman Tampah
           dengan komitmen <em>"Suguhan Cinta untuk Setiap Acara"</em>.
         </p>
 
@@ -85,7 +85,7 @@ function AboutPage() {
           <li>Bekerja sama untuk mencapai tujuan bersama yang berlandaskan kepercayaan, kepedulian, komunikasi dan sikap menghargai serta menghormati orang lain (Internal dan Eksternal).</li>
         </ol>
 
-        <h2 className="mt-8 font-display text-2xl font-bold text-primary">Nilai-Nilai Utama (Core Values)</h2>
+        <h2 className="mt-8 font-display text-2xl font-bold text-primary">Nilai-Nilai Utama</h2>
         <ul>
           <li>Kerja Ibadah - Bekerja dengan niat beribadah dan mengharapkan keberkahan.</li>
           <li>Integritas - Menjunjung tinggi kejujuran dan tanggung jawab penuh.</li>
@@ -100,7 +100,7 @@ function AboutPage() {
           { icon: Heart, t: "Dibuat dengan Cinta", d: "Setiap kue dibuat fresh setiap hari." },
           { icon: Sparkles, t: "Bahan Berkualitas", d: "Hanya bahan terbaik & 100% halal." },
           { icon: Users, t: "Custom Isi", d: "Sesuaikan paket dengan tamu Anda." },
-          { icon: Award, t: "Rating 4.6/5.0", d: "Dipercaya 30+ pelanggan tetap." },
+          { icon: Award, t: "Terpercaya", d: "Dipercaya ribuan pelanggan puas." },
         ].map((v) => (
           <div key={v.t} className="rounded-2xl border border-border bg-card p-5 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">

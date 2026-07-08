@@ -132,8 +132,7 @@ export function Footer() {
             dilindungi.
           </p>
           <p className="flex items-center gap-1">
-            Dibuat dengan <span className="animate-pulse text-red-500">♥</span> untuk melestarikan
-            rasa Nusantara.
+            Kue Acara & Snack Box Makassar
           </p>
         </div>
       </div>
