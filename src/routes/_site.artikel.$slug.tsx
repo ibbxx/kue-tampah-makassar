@@ -111,9 +111,10 @@ function ArticleDetail() {
       )}
 
       {article.excerpt && <p className="mt-6 text-lg text-muted-foreground">{article.excerpt}</p>}
-      <div className="prose prose-neutral mt-6 max-w-none whitespace-pre-wrap text-foreground/85">
-        {article.content}
-      </div>
+      <div
+        className="prose prose-neutral mt-6 max-w-none text-foreground/85"
+        dangerouslySetInnerHTML={{ __html: article.content ?? "" }}
+      />
     </article>
   );
 }

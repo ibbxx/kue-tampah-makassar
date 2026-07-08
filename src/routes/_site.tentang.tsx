@@ -58,24 +58,40 @@ function AboutPage() {
       <div className="prose prose-neutral mt-10 max-w-none text-foreground/80">
         <h2 className="font-display text-2xl font-bold text-primary">Latar Belakang</h2>
         <p>
-          {SITE_CONFIG.shortName} hadir dari kecintaan kami terhadap kekayaan kuliner tradisional{" "}
-          {SITE_CONFIG.city}. Berawal dari acara keluarga yang membutuhkan suguhan praktis namun
-          tetap istimewa, kami mengembangkan paket tampah yang menggabungkan beragam jajanan khas —
-          mulai dari pie buah, bolu gulung pandan, gogos tuna, risol mayo, kue ku', lumpia,
-          macaroni, hingga nona manis.
+          Terinspirasi dari budaya “Tudang Sipulung” masyarakat Bugis-Makassar yang gemar berkumpul bersama, 
+          PT. Berkah Bersama Gemilang melahirkan brand Kue Tampah pada Maret 2024. Brand ini hadir untuk 
+          memeriahkan suasana berkumpul yang disesuaikan dengan kebutuhan acara-acara di masa modern.
+        </p>
+        <p>
+          Meningkatnya perbedaan selera dari setiap orang yang berkumpul mendorong Kue Tampah untuk mengkreasikan 
+          lebih dari 40 varian kue bercita rasa asin dan manis guna memenuhi beragam kebutuhan tersebut. 
+          Kini, kami hadir di dua titik strategis Kota Makassar — Jl. Dr. Ratulangi No. 82 B dan 
+          Jl. Perintis Kemerdekaan Km. 12 — siap menjadi penyedia suguhan ringan nomor 1 pilihan Teman Tampah 
+          dengan komitmen <em>"Suguhan Cinta untuk Setiap Acara"</em>.
         </p>
 
         <h2 className="mt-8 font-display text-2xl font-bold text-primary">Visi</h2>
         <p>
-          Menjadi pilihan utama suguhan acara di {SITE_CONFIG.city} dengan menjaga cita rasa
-          tradisional dalam kemasan modern.
+          “Menjadi perusahaan Manufaktur & Retail dalam bidang Pastry & Bakery di seluruh Indonesia yang diberkahi oleh Allah SWT dan menjadi Rahmatan Lil’Alamin”
         </p>
 
         <h2 className="mt-8 font-display text-2xl font-bold text-primary">Misi</h2>
+        <ol>
+          <li>Sumber Daya Manusia yang selalu yakin bahwa Allah selalu bersamanya dalam segala aktivitas.</li>
+          <li>Memiliki sistem Keuangan yang terencana, kuat dan mandiri.</li>
+          <li>Mengelola dan mengembangkan bisnis di bidang Pastry & Bakery sesuai dengan kebutuhan pasar.</li>
+          <li>Peningkatan kesejahteraan karyawan berdasarkan performa kerja sesuai dengan kemampuan Perusahaan.</li>
+          <li>Komitmen untuk memberikan pelayanan terbaik, fokus pada kebutuhan pelanggan & membuat produk dengan kualitas dan cita rasa terbaik.</li>
+          <li>Bekerja sama untuk mencapai tujuan bersama yang berlandaskan kepercayaan, kepedulian, komunikasi dan sikap menghargai serta menghormati orang lain (Internal dan Eksternal).</li>
+        </ol>
+
+        <h2 className="mt-8 font-display text-2xl font-bold text-primary">Nilai-Nilai Utama (Core Values)</h2>
         <ul>
-          <li>Menjaga keaslian rasa kue tradisional {SITE_CONFIG.city}.</li>
-          <li>Menyajikan paket suguhan yang praktis, cantik, dan custom sesuai kebutuhan.</li>
-          <li>Memberi pengalaman pelayanan yang ramah dan tepat waktu.</li>
+          <li>Kerja Ibadah - Bekerja dengan niat beribadah dan mengharapkan keberkahan.</li>
+          <li>Integritas - Menjunjung tinggi kejujuran dan tanggung jawab penuh.</li>
+          <li>Menghargai - Saling peduli dan menghormati satu sama lain secara internal maupun eksternal.</li>
+          <li>Visioner & Fleksibel - Berorientasi ke depan dan adaptif terhadap perkembangan pasar.</li>
+          <li>Efektif & Efisien - Bekerja cerdas untuk memberikan kualitas dan hasil terbaik.</li>
         </ul>
       </div>
 

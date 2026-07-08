@@ -1,11 +1,21 @@
+import { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, List, ListOrdered, Heading2, Heading3, Quote, RotateCcw, RotateCw } from "lucide-react";
 
 export function RichTextEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [mounted, setMounted] = useState(false);
+  const [, setTick] = useState(0);
+  const forceUpdate = () => setTick((t) => t + 1);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const editor = useEditor({
     extensions: [StarterKit],
     content: value,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
@@ -15,9 +25,12 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    onSelectionUpdate: () => {
+      forceUpdate();
+    },
   });
 
-  if (!editor) {
+  if (!mounted || !editor) {
     return null;
   }
 
@@ -32,18 +45,18 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          disabled={!editor.can().chain().focus().toggleBold().run()}
-          className={toggleBtnClass(editor.isActive("bold"))}
-          title="Bold"
+          disabled={editor.state.selection.empty || !editor.can().chain().focus().toggleBold().run()}
+          className={`${toggleBtnClass(editor.isActive("bold"))} disabled:opacity-50 disabled:cursor-not-allowed`}
+          title="Bold (Membutuhkan seleksi teks)"
         >
           <Bold className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          disabled={!editor.can().chain().focus().toggleItalic().run()}
-          className={toggleBtnClass(editor.isActive("italic"))}
-          title="Italic"
+          disabled={editor.state.selection.empty || !editor.can().chain().focus().toggleItalic().run()}
+          className={`${toggleBtnClass(editor.isActive("italic"))} disabled:opacity-50 disabled:cursor-not-allowed`}
+          title="Italic (Membutuhkan seleksi teks)"
         >
           <Italic className="h-4 w-4" />
         </button>
@@ -53,16 +66,18 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={toggleBtnClass(editor.isActive("heading", { level: 2 }))}
-          title="Heading 2"
+          disabled={editor.state.selection.empty}
+          className={`${toggleBtnClass(editor.isActive("heading", { level: 2 }))} disabled:opacity-50 disabled:cursor-not-allowed`}
+          title="Heading 2 (Membutuhkan seleksi teks)"
         >
           <Heading2 className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={toggleBtnClass(editor.isActive("heading", { level: 3 }))}
-          title="Heading 3"
+          disabled={editor.state.selection.empty}
+          className={`${toggleBtnClass(editor.isActive("heading", { level: 3 }))} disabled:opacity-50 disabled:cursor-not-allowed`}
+          title="Heading 3 (Membutuhkan seleksi teks)"
         >
           <Heading3 className="h-4 w-4" />
         </button>
@@ -72,24 +87,27 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={toggleBtnClass(editor.isActive("bulletList"))}
-          title="Bullet List"
+          disabled={editor.state.selection.empty}
+          className={`${toggleBtnClass(editor.isActive("bulletList"))} disabled:opacity-50 disabled:cursor-not-allowed`}
+          title="Bullet List (Membutuhkan seleksi teks)"
         >
           <List className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={toggleBtnClass(editor.isActive("orderedList"))}
-          title="Ordered List"
+          disabled={editor.state.selection.empty}
+          className={`${toggleBtnClass(editor.isActive("orderedList"))} disabled:opacity-50 disabled:cursor-not-allowed`}
+          title="Ordered List (Membutuhkan seleksi teks)"
         >
           <ListOrdered className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={toggleBtnClass(editor.isActive("blockquote"))}
-          title="Blockquote"
+          disabled={editor.state.selection.empty}
+          className={`${toggleBtnClass(editor.isActive("blockquote"))} disabled:opacity-50 disabled:cursor-not-allowed`}
+          title="Blockquote (Membutuhkan seleksi teks)"
         >
           <Quote className="h-4 w-4" />
         </button>
