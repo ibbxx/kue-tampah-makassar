@@ -21,14 +21,14 @@ export const Route = createFileRoute("/_site/kontak")({
 
 const schema = z.object({
   name: z.string().trim().min(2, "Nama wajib").max(100),
-  email: z.string().trim().email("Email tidak valid").max(255).optional().or(z.literal("")),
   phone: z.string().trim().max(20).optional(),
   message: z.string().trim().min(5, "Pesan terlalu pendek").max(1000),
 });
 
 function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [form, setForm] = useState({ name: "", phone: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState<"ratulangi" | "perintis">("ratulangi");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +38,12 @@ function ContactPage() {
     try {
       const { error } = await supabase.from("contact_messages").insert({
         name: parsed.data.name,
-        email: parsed.data.email || null,
         phone: parsed.data.phone || null,
         message: parsed.data.message,
       });
       if (error) throw error;
       toast.success("Pesan terkirim! Kami akan segera menghubungi Anda.");
-      setForm({ name: "", email: "", phone: "", message: "" });
+      setForm({ name: "", phone: "", message: "" });
     } catch (err) {
       console.error(err);
       toast.error("Gagal mengirim pesan.");
@@ -77,23 +76,100 @@ function ContactPage() {
               text={SITE_CONFIG.instagram}
               href={SOCIAL_LINKS.instagram}
             />
-            <ContactCard
-              icon={Mail}
-              title="Email"
-              text={SITE_CONFIG.email}
-              href={`mailto:${SITE_CONFIG.email}`}
-            />
             <ContactCard icon={Clock} title="Jam Buka" text={SITE_CONFIG.openingHours} />
-            <div className="sm:col-span-2">
-              <ContactCard icon={MapPin} title="Alamat" text={SITE_CONFIG.address} />
+            <div className="sm:col-span-2 space-y-3">
+              <div className="text-xs font-semibold text-foreground px-1">Lokasi Kami</div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedBranch("ratulangi")}
+                  className={`text-left block w-full rounded-2xl border p-4 transition-all duration-200 hover:shadow-sm focus:outline-none ${
+                    selectedBranch === "ratulangi"
+                      ? "border-primary bg-primary/5 ring-1 ring-primary"
+                      : "border-border bg-card hover:border-primary/40"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+                      selectedBranch === "ratulangi" ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                    }`}>
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-sm text-foreground flex items-center gap-1.5 flex-wrap">
+                        Cabang Ratulangi
+                        {selectedBranch === "ratulangi" && (
+                          <span className="inline-flex items-center rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                            Terpilih
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                        {SITE_CONFIG.address}
+                      </div>
+                      <a
+                        href="https://www.google.com/maps/search/Kue+Tampah+Jl.+DR.+Ratulangi+No.+82+Makassar"
+                        target="_blank"
+                        rel="noopener"
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                      >
+                        Buka Maps
+                        <Send className="h-2.5 w-2.5" />
+                      </a>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedBranch("perintis")}
+                  className={`text-left block w-full rounded-2xl border p-4 transition-all duration-200 hover:shadow-sm focus:outline-none ${
+                    selectedBranch === "perintis"
+                      ? "border-primary bg-primary/5 ring-1 ring-primary"
+                      : "border-border bg-card hover:border-primary/40"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+                      selectedBranch === "perintis" ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                    }`}>
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-sm text-foreground flex items-center gap-1.5 flex-wrap">
+                        Cabang Perintis
+                        {selectedBranch === "perintis" && (
+                          <span className="inline-flex items-center rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                            Terpilih
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                        {SITE_CONFIG.addressPerintis}
+                      </div>
+                      <a
+                        href="https://maps.app.goo.gl/nHLqSSiUY5LXoS2L9"
+                        target="_blank"
+                        rel="noopener"
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                      >
+                        Buka Maps
+                        <Send className="h-2.5 w-2.5" />
+                      </a>
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-border transition-all duration-200 hover:border-primary/40 hover:shadow-sm">
             <iframe
-              title={`Lokasi ${SITE_CONFIG.name}`}
-              src={SITE_CONFIG.mapEmbedUrl}
-              className="h-72 w-full"
+              title={`Lokasi Kue Tampah Cabang ${selectedBranch === "ratulangi" ? "Ratulangi" : "Perintis"}`}
+              src={selectedBranch === "ratulangi" ? SITE_CONFIG.mapEmbedUrl : SITE_CONFIG.mapEmbedUrlPerintis}
+              className="h-72 w-full transition-all duration-300"
               loading="lazy"
             />
           </div>
@@ -106,12 +182,6 @@ function ContactPage() {
               label="Nama Lengkap"
               value={form.name}
               onChange={(v) => setForm({ ...form, name: v })}
-            />
-            <Field
-              label="Email"
-              value={form.email}
-              onChange={(v) => setForm({ ...form, email: v })}
-              type="email"
             />
             <Field
               label="Nomor WhatsApp"

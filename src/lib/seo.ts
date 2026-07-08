@@ -76,7 +76,6 @@ export function localBusinessJsonLd() {
     description: SITE_CONFIG.description,
     url: SITE_CONFIG.url,
     telephone: `+${SITE_CONFIG.whatsapp}`,
-    email: SITE_CONFIG.email,
     address: {
       "@type": "PostalAddress",
       streetAddress: "Jl. DR. Ratulangi",

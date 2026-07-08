@@ -71,10 +71,19 @@ export function Footer() {
           <h4 className="mb-6 font-display text-lg font-bold text-white">Hubungi Kami</h4>
           <ul className="space-y-4 text-sm text-zinc-400">
             <li className="group flex items-start gap-3 transition-colors hover:text-white">
-              <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+              <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                 <MapPin className="h-3 w-3" />
               </div>
-              <span className="leading-relaxed">{SITE_CONFIG.addressShort}</span>
+              <div className="flex flex-col gap-1.5">
+                <div>
+                  <span className="block leading-relaxed font-semibold text-zinc-200">Cabang Ratulangi</span>
+                  <span className="block text-xs text-zinc-400">Jl. DR. Ratulangi, Mariso</span>
+                </div>
+                <div>
+                  <span className="block leading-relaxed font-semibold text-zinc-200">Cabang Perintis</span>
+                  <span className="block text-xs text-zinc-400">Jl. Perintis Kemerdekaan KM 12</span>
+                </div>
+              </div>
             </li>
             <li className="group flex items-center gap-3 transition-colors hover:text-white">
               <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">

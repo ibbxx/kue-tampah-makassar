@@ -36,9 +36,8 @@ export const Route = createFileRoute("/_site/keranjang")({
 });
 
 const formSchema = z.object({
-  name: z.string().trim().min(2, "Nama wajib diisi").max(100),
-  phone: z.string().trim().min(8, "Nomor HP tidak valid").max(20),
-  email: z.string().trim().email("Email tidak valid").optional().or(z.literal("")),
+  name: z.string().trim().min(2, "Nama minimal 2 karakter"),
+  phone: z.string().trim().min(8, "Nomor HP minimal 8 karakter"),
   address: z.string().trim().max(500).optional(),
   notes: z.string().trim().max(500).optional(),
 });
@@ -64,8 +63,9 @@ function CartPage() {
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>(1);
-  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", address: "", notes: "" });
   const [isPickup, setIsPickup] = useState(false);
+  const [pickupBranch, setPickupBranch] = useState<"ratulangi" | "perintis">("ratulangi");
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -124,8 +124,9 @@ function CartPage() {
         .insert({
           customer_name: parsed.data.name,
           phone: parsed.data.phone,
-          email: parsed.data.email || null,
-          address: isPickup ? null : (parsed.data.address ?? null),
+          address: isPickup
+            ? `Ambil Sendiri: Cabang ${pickupBranch === "ratulangi" ? "Ratulangi" : "Perintis"}`
+            : (parsed.data.address ?? null),
           notes: parsed.data.notes ?? null,
           total,
           status: "pending",
@@ -229,6 +230,8 @@ function CartPage() {
               setForm={setForm}
               isPickup={isPickup}
               setIsPickup={setIsPickup}
+              pickupBranch={pickupBranch}
+              setPickupBranch={setPickupBranch}
             />
           )}
           {step === 3 && (
@@ -412,11 +415,15 @@ function ShippingStep({
   setForm,
   isPickup,
   setIsPickup,
+  pickupBranch,
+  setPickupBranch,
 }: {
-  form: { name: string; phone: string; email: string; address: string; notes: string };
+  form: { name: string; phone: string; address: string; notes: string };
   setForm: (f: typeof form) => void;
   isPickup: boolean;
   setIsPickup: (v: boolean) => void;
+  pickupBranch: "ratulangi" | "perintis";
+  setPickupBranch: (v: "ratulangi" | "perintis") => void;
 }) {
   return (
     <div className="space-y-6">
@@ -436,13 +443,6 @@ function ShippingStep({
             onChange={(v) => setForm({ ...form, phone: v })}
             placeholder="08xx"
             type="tel"
-          />
-          <Field
-            label="Email (opsional)"
-            value={form.email}
-            onChange={(v) => setForm({ ...form, email: v })}
-            placeholder="email@contoh.com"
-            type="email"
           />
         </div>
       </div>
@@ -499,9 +499,44 @@ function ShippingStep({
         )}
 
         {isPickup && (
-          <div className="rounded-xl bg-muted/50 p-4 text-sm text-muted-foreground">
-            <div className="font-semibold text-foreground mb-1">Lokasi Pickup</div>
-            {SITE_CONFIG.address}
+          <div className="space-y-3">
+            <label className="text-xs font-medium text-muted-foreground">Pilih Lokasi Ambil (Pickup) *</label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setPickupBranch("ratulangi")}
+                className={`text-left block rounded-xl border p-4 transition-all duration-200 ${
+                  pickupBranch === "ratulangi"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
+                    : "border-border bg-card hover:border-primary/30"
+                }`}
+              >
+                <div className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  Cabang Ratulangi
+                </div>
+                <div className="mt-1 text-2xs text-muted-foreground leading-relaxed">
+                  Jl. DR. Ratulangi, Mariso, Makassar
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPickupBranch("perintis")}
+                className={`text-left block rounded-xl border p-4 transition-all duration-200 ${
+                  pickupBranch === "perintis"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
+                    : "border-border bg-card hover:border-primary/30"
+                }`}
+              >
+                <div className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  Cabang Perintis
+                </div>
+                <div className="mt-1 text-2xs text-muted-foreground leading-relaxed">
+                  Jl. Perintis Kemerdekaan KM 12, Tamalanrea
+                </div>
+              </button>
+            </div>
           </div>
         )}
 
